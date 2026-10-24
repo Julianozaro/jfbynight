@@ -1,0 +1,1207 @@
+<!doctype html>
+<html lang="pt-BR">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Atlas · Juiz de Fora by Night</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,700&family=Spectral:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: arquivo noturno — trilho lateral de navegação + coluna de leitura; fichas no formato de bolinhas do V5 */
+:root{
+  --bg:#0f0d12; --surface:#17141c; --raised:#1f1b26; --line:#2d2735; --fg:#ebe5e8; --muted:#9d93a1;
+  --blood:#c42a3a; --blood-soft:#c42a3a26; --lamp:#d9a441; --lamp-soft:#d9a44122; --dot-off:#3a3342;
+  --display:"Bodoni Moda",Didot,"Times New Roman",serif; --body:"Spectral",Georgia,serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{background:var(--bg);color:var(--fg)}
+body{font-family:var(--body);font-size:16px;line-height:1.6;margin:0}
+a{color:inherit}
+button,select,input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--lamp);outline-offset:2px}
+.app{display:grid;grid-template-columns:250px minmax(0,1fr);min-height:100vh}
+nav.side{position:sticky;top:env(safe-area-inset-top,0px);height:100vh;overflow:auto;border-right:1px solid var(--line);
+  padding:28px 20px;display:flex;flex-direction:column;gap:22px;background:var(--surface)}
+.brand{font-family:var(--display);font-size:26px;line-height:1.05;letter-spacing:.01em;text-wrap:balance}
+.brand small{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-top:8px}
+.brand b{color:var(--blood);font-weight:700}
+.nav{display:flex;flex-direction:column;gap:2px}
+.nav a{text-decoration:none;padding:7px 10px;border-radius:6px;color:var(--muted);display:flex;justify-content:space-between;gap:8px}
+.nav a span{font-family:var(--mono);font-size:12px}
+.nav a:hover{background:var(--raised);color:var(--fg)}
+.nav a.on{color:var(--fg);background:var(--blood-soft);box-shadow:inset 2px 0 0 var(--blood)}
+.search{width:100%;padding:9px 12px;border-radius:6px;border:1px solid var(--line);background:var(--bg)}
+.sres{display:flex;flex-direction:column;gap:2px;margin-top:6px}
+.sres a{text-decoration:none;font-size:14px;padding:5px 8px;border-radius:4px}
+.sres a:hover{background:var(--raised)}
+.sres em{font-style:normal;font-family:var(--mono);font-size:11px;color:var(--muted);margin-left:6px}
+.gm{margin-top:auto;font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:14px}
+.theme{display:flex;gap:4px;margin-top:10px}
+.theme button{flex:1;border:1px solid var(--line);background:none;border-radius:4px;padding:4px;font-family:var(--mono);font-size:11px;cursor:pointer}
+.theme button.on{border-color:var(--lamp);color:var(--lamp)}
+main{padding-block:36px 80px;padding-inline:clamp(16px,4vw,56px);min-width:0;max-width:1180px}
+h1,h2,h3{font-family:var(--display);font-weight:500;text-wrap:balance;line-height:1.15;margin:0}
+h1{font-size:clamp(32px,4.6vw,52px)}
+h2{font-size:26px}
+h3{font-size:19px}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.lede{color:var(--muted);max-width:62ch}
+.stack{display:flex;flex-direction:column;gap:28px}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.chip{font-family:var(--mono);font-size:12px;padding:3px 9px;border:1px solid var(--line);border-radius:999px;white-space:nowrap;text-decoration:none}
+a.chip:hover{border-color:var(--muted)}
+.chip.pc{border-color:var(--lamp);color:var(--lamp)}
+.chip.priv{border-color:var(--blood);color:var(--blood)}
+.chip.k{color:var(--muted)}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.tabs button{background:none;border:0;padding:10px 14px;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px}
+.tabs button.on{color:var(--fg);border-color:var(--blood)}
+.filters{display:flex;flex-wrap:wrap;gap:10px}
+.filters select,.filters input{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:7px 10px;min-width:0}
+.filters input{flex:1 1 200px}
+.count{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px}
+.card{display:flex;flex-direction:column;text-decoration:none;background:var(--surface);border:1px solid var(--line);border-radius:8px;overflow:hidden;transition:border-color .15s}
+.card:hover{border-color:var(--muted)}
+.card .ph{aspect-ratio:4/5;background:var(--raised);position:relative;overflow:hidden}
+.card .ph img{width:100%;height:100%;object-fit:cover;display:block}
+.mono-ph{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--display);font-size:64px;color:var(--dot-off)}
+.card .bd{padding:12px 14px;display:flex;flex-direction:column;gap:4px;flex:1}
+.card .nm{font-family:var(--display);font-size:18px;line-height:1.2}
+.card .meta{font-size:13px;color:var(--muted)}
+.card .tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:auto;padding-top:6px}
+.card .tags .chip{font-size:10.5px;padding:1px 7px}
+.hero{display:grid;grid-template-columns:minmax(0,300px) minmax(0,1fr);gap:32px;align-items:start}
+.hero .portrait{border-radius:8px;overflow:hidden;background:var(--raised);aspect-ratio:4/5;position:relative;border:1px solid var(--line)}
+.hero .portrait img{width:100%;height:100%;object-fit:cover;display:block}
+.facts{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.facts div{background:var(--surface);padding:10px 12px}
+.facts dt{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.facts dd{margin:2px 0 0;font-size:17px;font-variant-numeric:tabular-nums}
+.sheet{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px 28px}
+.sheet h4{grid-column:1/-1;margin:14px 0 0;font-family:var(--mono);font-weight:500;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--blood);border-bottom:1px solid var(--line);padding-bottom:6px}
+.col{display:flex;flex-direction:column;gap:3px;min-width:0}
+.col .ct{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+.tr{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:15px}
+.tr.z{color:var(--muted)}
+.spec{font-size:12.5px;color:var(--blood);font-style:italic}
+.tr.vt{align-items:flex-start;padding:3px 0;border-bottom:1px dotted var(--line)}
+.tr.vt>span:first-child{display:flex;flex-direction:column;gap:1px}
+.tr.vt small{font-size:12px;color:var(--muted);line-height:1.3}
+.tr.vt small.en{font-family:var(--mono);font-size:10.5px;letter-spacing:.04em}
+.tr.vt .lv{display:inline-block;min-width:1.4em;font-family:var(--mono);font-size:11px;color:var(--blood)}
+.sheet.vant .col .ct{display:flex;justify-content:space-between;align-items:center}
+.node.unk .av{border-style:dashed;background:transparent}
+.node.unk .nm{color:var(--muted);font-style:italic}
+.promo{display:grid;grid-template-columns:minmax(140px,220px) 1fr;gap:22px;align-items:center;padding:18px;border:1px solid var(--line);border-left:3px solid var(--blood);background:linear-gradient(120deg,var(--blood-soft),transparent 70%);border-radius:10px}
+.promo img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:6px;display:block;box-shadow:0 10px 30px #0008}
+@media (max-width:640px){.promo{grid-template-columns:1fr}.promo img{max-width:240px}}
+.album{display:grid;grid-template-columns:minmax(220px,360px) 1fr;gap:28px;align-items:start}
+@media (max-width:760px){.album{grid-template-columns:1fr}}
+.album .covers{display:grid;gap:10px}
+.album .cv{all:unset;cursor:zoom-in;display:block}.album .cv img{width:100%;display:block;border-radius:6px}
+.tracks{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
+.tracks button{all:unset;box-sizing:border-box;cursor:pointer;display:grid;grid-template-columns:2.4em 1fr auto;gap:10px;width:100%;padding:9px 6px;border-bottom:1px solid var(--line);font-size:16px}
+.tracks button:hover,.tracks button:focus-visible{background:var(--raised)}
+.tracks .n,.tracks .d{font-family:var(--mono);font-size:12px;color:var(--muted);align-self:center}
+.tracks button.on{color:var(--blood)}.tracks button.on .n{color:var(--blood)}
+#player{position:fixed;left:0;right:0;bottom:0;z-index:50;display:flex;align-items:center;gap:12px;padding:8px 14px;background:color-mix(in srgb,var(--surface) 94%,transparent);backdrop-filter:blur(6px);border-top:1px solid var(--line)}
+#player[hidden]{display:none}
+#player .pc{width:44px;height:44px;object-fit:cover;border-radius:4px;flex:none}
+#player .pi{min-width:0;flex:0 1 220px}#player .pt{font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#player .pa{font-size:11.5px;color:var(--muted);font-family:var(--mono)}
+#player .pb{display:flex;gap:4px}
+#player button{all:unset;cursor:pointer;padding:6px 8px;border-radius:6px;color:var(--fg)}#player button:hover,#player button:focus-visible{background:var(--raised)}
+#player input{flex:1;min-width:60px;accent-color:var(--blood)}#player .tm{font-family:var(--mono);font-size:11.5px;color:var(--muted);white-space:nowrap}
+body.playing main{padding-bottom:84px}
+body.playing .side{padding-bottom:76px}
+@media (max-width:640px){#player .tm{display:none}#player .pi{flex-basis:120px}}
+.dots{display:inline-flex;gap:3px;flex:none}
+.dots i{width:10px;height:10px;border-radius:50%;border:1.5px solid var(--muted);display:block}
+.dots i.f{background:var(--fg);border-color:var(--fg)}
+.tr.z .dots i{border-color:var(--dot-off)}
+.boxes{display:flex;gap:4px;flex-wrap:wrap}
+.boxes i{width:16px;height:16px;border:1.5px solid var(--muted);display:block;border-radius:2px}
+.boxes i.f{background:var(--blood);border-color:var(--blood)}
+.boxes.wp i.f{background:var(--fg);border-color:var(--fg)}
+.boxes.hu i.f{background:var(--lamp);border-color:var(--lamp)}
+.trackers{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+.trackers .t{display:flex;flex-direction:column;gap:6px}
+.prose{max-width:70ch;font-size:16.5px}
+.prose h1,.prose h2,.prose h3,.prose h4,.prose h5{font-family:var(--display);margin:1.4em 0 .4em;font-size:21px}
+.prose h1{font-size:24px}
+.prose p{margin:.6em 0}
+.prose a[data-ref]{color:var(--blood);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px;cursor:pointer}
+.prose a.nolink{color:inherit;text-decoration:none;cursor:default}
+.prose hr{border:0;border-top:1px solid var(--line);margin:1.6em 0}
+.prose img{border-radius:6px}
+.tbl{overflow-x:auto;max-width:100%}
+.prose table,table.data{border-collapse:collapse;font-size:14px;margin:1em 0;min-width:100%}
+.prose th,.prose td,table.data th,table.data td{border-bottom:1px solid var(--line);padding:6px 10px;text-align:left;vertical-align:top}
+.prose th,table.data th{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:500}
+table.data td.n,table.data th.n{text-align:right;font-variant-numeric:tabular-nums}
+table.data tr.link{cursor:pointer}
+table.data tr.link:hover td{background:var(--raised)}
+details.post{border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+details.post summary{cursor:pointer;padding:12px 16px;font-family:var(--display);font-size:19px;display:flex;gap:10px;align-items:center;list-style:none}
+details.post summary::-webkit-details-marker{display:none}
+details.post summary::before{content:"+";font-family:var(--mono);color:var(--muted);width:1ch}
+details.post[open] summary::before{content:"−"}
+details.post .prose{padding:0 18px 16px}
+.timeline{display:flex;flex-direction:column;border-left:1px solid var(--line);margin-left:6px}
+.ses{position:relative;padding:0 0 26px 26px;display:grid;grid-template-columns:minmax(0,1fr) 140px;gap:18px;text-decoration:none}
+.ses::before{content:"";position:absolute;left:-6px;top:8px;width:11px;height:11px;border-radius:50%;background:var(--bg);border:2px solid var(--blood)}
+.ses:hover h3{color:var(--blood)}
+.ses p{margin:4px 0 0;color:var(--muted);font-size:15px}
+.ses img{width:140px;aspect-ratio:3/2;object-fit:cover;border-radius:6px;border:1px solid var(--line)}
+.xp{font-family:var(--mono);font-size:12px;color:var(--lamp)}
+.banner{width:100%;max-height:340px;object-fit:cover;border-radius:8px;border:1px solid var(--line)}
+.kv{display:grid;grid-template-columns:minmax(110px,max-content) minmax(0,1fr);gap:6px 18px;font-size:15px}
+.kv dt{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding-top:3px}
+.kv dd{margin:0}
+.sects{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+.sect{display:grid;grid-template-columns:72px minmax(0,1fr);gap:14px;padding:14px;background:var(--surface);border:1px solid var(--line);border-radius:8px;text-decoration:none;align-items:center}
+.sect:hover{border-color:var(--muted)}
+.sect img,.sect .mono{width:72px;height:72px;border-radius:6px;object-fit:cover;background:var(--raised);display:grid;place-items:center;font-family:var(--display);font-size:30px;color:var(--muted)}
+.sect .nm{font-family:var(--display);font-size:20px}
+.sect .meta{font-size:13px;color:var(--muted)}
+.heat td.c{text-align:center;font-variant-numeric:tabular-nums;font-family:var(--mono);font-size:13px;min-width:34px}
+.heat th.v{writing-mode:vertical-rl;transform:rotate(180deg);height:110px;padding:6px 4px;white-space:nowrap}
+.bars{display:flex;flex-direction:column;gap:6px}
+.bar{display:grid;grid-template-columns:minmax(120px,170px) minmax(0,1fr) 40px;gap:10px;align-items:center;font-size:14px}
+.bar .tk{height:12px;background:var(--raised);border-radius:3px;overflow:hidden}
+.bar .tk b{display:block;height:100%;background:var(--blood)}
+.bar .n{font-family:var(--mono);font-size:12px;text-align:right}
+.note{border-left:2px solid var(--lamp);padding:8px 14px;background:var(--lamp-soft);font-size:14.5px;max-width:70ch}
+.two{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:32px}
+.pager{display:flex;justify-content:space-between;gap:12px;border-top:1px solid var(--line);padding-top:16px}
+.pager a{text-decoration:none;max-width:48%}
+.pager a small{display:block}
+.mobilebar{display:none}
+@media (max-width:860px){
+  .app{grid-template-columns:minmax(0,1fr)}
+  nav.side{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line);padding:16px}
+  nav.side .nav{flex-direction:row;flex-wrap:wrap}
+  nav.side .nav a span{display:none}
+  .gm{margin-top:0}
+  .hero,.two{grid-template-columns:minmax(0,1fr)}
+  .hero .portrait{max-width:260px}
+  .sheet{grid-template-columns:minmax(0,1fr)}
+  .ses{grid-template-columns:minmax(0,1fr)}
+  .ses img{display:none}
+}
+
+.crumbs{font-family:var(--mono);font-size:12px;color:var(--muted);display:flex;gap:6px;flex-wrap:wrap}
+.crumbs a{text-decoration:none;color:var(--muted)} .crumbs a:hover{color:var(--fg)}
+.tree{display:flex;flex-direction:column;gap:8px}
+.tree details{border-left:1px solid var(--line);margin-left:36px;padding-left:16px;display:flex;flex-direction:column;gap:8px}
+.tree summary{list-style:none;cursor:pointer;font-family:var(--mono);font-size:12px;color:var(--muted);margin:2px 0 6px -16px;padding-left:16px}
+.tree summary::-webkit-details-marker{display:none}
+.tree summary::before{content:"▸ ";color:var(--blood)} .tree details[open] summary::before{content:"▾ "}
+.tree .sect{position:relative}
+.tree details .sect::before{content:"";position:absolute;left:-17px;top:50%;width:16px;border-top:1px solid var(--line)}
+.org{display:flex;flex-direction:column;align-items:center;gap:0;overflow-x:auto;padding-bottom:8px}
+.tier{display:flex;flex-direction:column;align-items:center;gap:10px;width:100%}
+.tier .lab{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--blood)}
+.tier .nodes{display:flex;flex-wrap:wrap;justify-content:center;gap:12px}
+.link-v{width:1px;height:26px;background:var(--line);margin:4px auto}
+.node{display:flex;flex-direction:column;align-items:center;gap:6px;width:112px;text-decoration:none;text-align:center}
+.node .av{width:72px;height:90px;border-radius:6px;overflow:hidden;background:var(--raised);border:1px solid var(--line);position:relative}
+.node .av img{width:100%;height:100%;object-fit:cover;display:block}
+.node .av img.emb,.sect img.emb{object-fit:contain;padding:6px;box-sizing:border-box}
+.node .av .mono-ph{font-size:30px}
+.node:hover .av{border-color:var(--blood)}
+.node .nm{font-size:13.5px;line-height:1.2}
+.node .rl{font-size:11.5px;color:var(--muted);line-height:1.2}
+.node.top .av{width:96px;height:120px;border-color:var(--blood)}
+.gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px}
+.gal button{padding:0;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:var(--raised);cursor:zoom-in;aspect-ratio:3/4}
+.gal img{width:100%;height:100%;object-fit:cover;display:block}
+.lb{position:fixed;inset:0;background:#000d;display:grid;place-items:center;z-index:50;padding:24px;cursor:zoom-out}
+.lb img{max-height:92vh;max-width:96vw;border-radius:6px}
+.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+.cal .dh{font-family:var(--mono);font-size:11px;color:var(--muted);text-align:center;padding:4px 0;letter-spacing:.1em}
+.cal .d{min-height:84px;border:1px solid var(--line);border-radius:6px;padding:6px;background:var(--surface);display:flex;flex-direction:column;gap:4px;font-size:12px;min-width:0}
+.cal .d.out{background:none;border-style:dashed;opacity:.45}
+.cal .d .n{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.cal .d.hit{border-color:var(--blood);background:var(--blood-soft)}
+.cal .d a{text-decoration:none;line-height:1.25;overflow:hidden;text-overflow:ellipsis}
+.cal .d a:hover{color:var(--blood)}
+.night{font-family:var(--mono);font-size:11px;color:var(--lamp)}
+.viewer{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:6px 8px;border:1px solid var(--lamp);color:var(--lamp);border-radius:4px;text-align:center}
+@media (max-width:860px){.cal .d{min-height:60px;font-size:10.5px}.node{width:92px}}
+.board{position:relative;border:1px solid var(--line);border-radius:10px;overflow:hidden;
+  background:radial-gradient(1200px 500px at 20% 0%,#2a1d22 0%,transparent 60%),radial-gradient(900px 600px at 90% 100%,#1c1a2b 0%,transparent 55%),#141118}
+.board svg{display:block;width:100%;height:auto;touch-action:none;cursor:grab}
+.board .tools{display:flex;flex-wrap:wrap;gap:12px 18px;align-items:center;padding:12px 14px;border-bottom:1px solid var(--line);background:#120f16cc}
+.board .tools label{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);display:flex;gap:8px;align-items:center}
+.board input[type=range]{accent-color:var(--blood);width:min(260px,50vw)}
+.board .info{position:absolute;right:12px;bottom:12px;max-width:min(320px,70%);background:#0f0d12ee;border:1px solid var(--line);border-radius:8px;padding:12px 14px;font-size:14px}
+.board .info[hidden]{display:none}
+.legend{display:flex;flex-wrap:wrap;gap:8px 16px;font-size:13px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:12px;height:12px;border-radius:3px;display:inline-block}
+.mapwrap{border:1px solid var(--line);border-radius:10px;background:#120f16;padding:10px}
+.mapwrap svg{display:block;width:100%;height:auto}
+.mapwrap path.reg{stroke:#0f0d12;stroke-width:1.6;cursor:pointer;transition:opacity .15s}
+.mapwrap path.reg:hover{opacity:.85}
+.pbox{border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:16px 18px;display:flex;flex-direction:column;gap:12px}
+.pbox h3{margin:0;font-size:20px}
+.pform{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px 14px;align-items:end}
+.pform label,.pfield{display:flex;flex-direction:column;gap:5px;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.pform select,.pform input,.pfield input,.pfield textarea,.pbox select,.pbox input{background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:8px 10px;color:var(--fg);font:inherit;font-size:15px;letter-spacing:0;text-transform:none;min-width:0}
+.pfield textarea{resize:vertical;min-height:2.6em;line-height:1.45}
+.btn{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:9px 14px;border-radius:6px;border:1px solid var(--blood);background:var(--blood-soft);color:var(--fg);cursor:pointer}
+.btn:hover{background:var(--blood);}
+.btn.ghost{border-color:var(--line);background:transparent;color:var(--muted)}
+.btn.ghost:hover{color:var(--fg);border-color:var(--fg)}
+.btn.ok{border-color:var(--lamp);background:var(--lamp-soft)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.sm{padding:5px 9px;font-size:11px}
+.xpbig{font-family:var(--display);font-size:42px;line-height:1}
+.st-pendente{color:var(--lamp)} .st-aprovado{color:#7fbf7f} .st-recusado{color:var(--blood);text-decoration:line-through}
+.pmsg{font-size:14px;color:var(--muted)} .pmsg.err{color:var(--blood)} .pmsg.okm{color:#7fbf7f}
+.pnav{margin-top:10px;display:flex;flex-direction:column;gap:8px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="app" id="shell" hidden>
+  <nav class="side" aria-label="Navegação">
+    <div class="brand">Juiz de Fora<br><b>A Nova Noite</b><small>Crônica · V5</small></div>
+    <div>
+      <label class="eyebrow" for="q">Buscar</label>
+      <input id="q" class="search" type="search" placeholder="Nome, clã, seita, sessão…" autocomplete="off">
+      <div class="sres" id="sres"></div>
+    </div>
+    <div class="nav" id="nav"></div>
+    <div class="gm"><div class="viewer" id="viewer"></div><p id="viewer-note" style="margin:8px 0 0"></p>
+    </div>
+  </nav>
+  <main id="main" tabindex="-1"></main>
+</div>
+
+<script id="data" type="application/json">{}</script>
+<style>
+#login{position:fixed;inset:0;display:grid;place-items:center;background:radial-gradient(circle at 30% 20%,#2a0f17,var(--bg) 60%);z-index:100;padding:16px}
+#login[hidden]{display:none}
+#lf{display:flex;flex-direction:column;gap:10px;width:min(360px,100%);padding:28px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+#lf .brand{margin-bottom:12px}#lf .btn{margin-top:8px}
+.visrow{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center}
+.vischk{display:inline-flex;gap:5px;align-items:center;font-size:13.5px;padding:3px 8px;border:1px solid var(--line);border-radius:999px;cursor:pointer}
+.vischk.ov{border-color:var(--lamp);background:var(--lamp-soft)}
+table.vis td.c{text-align:center}table.vis .vischk{border:0;padding:2px}table.vis tr.grp td{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--blood);padding-top:14px}
+</style><div id="login" hidden><form id="lf" autocomplete="on">
+  <div class="brand" style="font-size:34px">Juiz de Fora<br><b>A Nova Noite</b><small>Atlas · Vampiro: A Máscara V5</small></div>
+  <label class="eyebrow" for="lu">Usuário</label><input id="lu" name="u" class="search" autocomplete="username" required>
+  <label class="eyebrow" for="lp">Senha</label><input id="lp" name="p" type="password" class="search" autocomplete="current-password" required>
+  <button class="btn" type="submit">Entrar</button><p id="lmsg" class="count" role="status"></p>
+  <p class="count">Cada perfil abre só o que aquele personagem conhece.</p></form></div>
+<script id="atlas-cfg" type="application/json">{"salt": "21ed15ca5bbbd007"}</script>
+<script id="app" type="text/plain">
+const D = window.__D;
+const V = D.viewer || { mode: 'gm' };
+const GM = V.mode === 'gm';
+const P = window.__P || null;
+const $ = (s, el = document) => el.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const norm = s => String(s ?? '').normalize('NFKD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/["'().]/g, ' ').replace(/\s+/g, ' ').trim();
+const byId = {}; D.chars.forEach(c => byId['p-' + c.id] = c);
+const orgBy = {}; D.orgs.forEach(o => orgBy[o.id] = o);
+const orgBySheet = {}; D.orgs.forEach(o => orgBySheet[o.sheet_name] = o);
+const sesBy = {}; D.sessions.forEach((s, i) => { s.n = i; sesBy[s.id] = s; });
+const cleanName = n => n.replace(/^Sessão\s*/i, '');
+const catShort = c => c ? String(c).replace(/^\d\s*-\s*/, '') : '';
+const MESES = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+const DIAS = ['domingo','segunda','terça','quarta','quinta','sexta','sábado'];
+const dt = iso => { const [y, m, d] = iso.split('-').map(Number); return new Date(y, m - 1, d); };
+const fmtDate = d => d ? (x => `${String(x.getDate()).padStart(2, '0')} ${MESES[x.getMonth()]} ${x.getFullYear()}`)(dt(d)) : 'sem data';
+const ingame = s => s.ingame ? `Noite ${s.day} · ${DIAS[dt(s.ingame).getDay()]}, ${fmtDate(s.ingame)}` : 'Data in-game a definir';
+const excerpt = (h, n) => { const t = (h || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim(); return t.length > n ? t.slice(0, n).replace(/\s\S*$/, '') + '…' : t; };
+const face = (c, cls = 'mono-ph') => c.img ? `<img src="${c.img}" alt="Retrato de ${esc(c.name)}" loading="lazy">` : `<div class="${cls}" aria-hidden="true">${esc((c.name || '?')[0])}</div>`;
+const dots = (n, max = 5) => `<span class="dots" aria-label="${n} de ${max}">${Array.from({length: max}, (_, i) => `<i class="${i < n ? 'f' : ''}"></i>`).join('')}</span>`;
+const boxes = (n, max, cls) => `<span class="boxes ${cls}" aria-label="${n} de ${max}">${Array.from({length: max}, (_, i) => `<i class="${i < n ? 'f' : ''}"></i>`).join('')}</span>`;
+const sectLink = s => { const o = orgBySheet[s]; return o ? `<a class="chip" href="#s-${o.id}">${esc(s)}</a>` : (s ? `<span class="chip">${esc(s)}</span>` : ''); };
+const emblem = o => (o.emblem || o.img) ? `<img class="emb" src="${o.emblem || o.img}" alt="" style="background:${o.ebg || '#fff'}">` : `<span class="mono">${esc(o.name[0])}</span>`;
+
+$('#viewer').textContent = GM ? 'Visão do narrador' : V.mode === 'owner' ? 'Narrador · portal' : V.mode === 'visitante' ? 'Visitante' : `Visão de ${V.name}`;
+$('#viewer-note').textContent = GM ? 'Inclui fichas, histórias, XP e conteúdo privado do Kanka. Não compartilhe este link com jogadores.'
+  : V.mode === 'owner' ? 'Aqui você vê só o que é comum a todos os jogadores. Use o painel para ligar contas e ver como cada jogador.'
+  : V.mode === 'visitante' ? 'Você vê o que é comum a todos. Sua ficha aparece quando o narrador ligar sua conta ao personagem.'
+  : `Mostra a ${V.sect} e quem já apareceu na crônica. Fichas e histórias dos outros ficam com o narrador.`;
+
+function resolveRefs(root) {
+  root.querySelectorAll('a[data-ref]').forEach(a => {
+    const t = D.ref[norm(a.dataset.ref)];
+    if (t && (byId[t] || !t.startsWith('p-'))) a.setAttribute('href', '#' + t); else { a.classList.add('nolink'); a.removeAttribute('data-ref'); }
+  });
+  root.querySelectorAll('.prose table').forEach(t => { if (!t.parentElement.classList.contains('tbl')) { const w = document.createElement('div'); w.className = 'tbl'; t.replaceWith(w); w.appendChild(t); } });
+}
+
+const NAV = [['inicio', 'Início'], ['personagens', 'Personagens', D.chars.length], ['seitas', 'Seitas', D.orgs.length], ['mapa', 'Mapa'],
+  ['cronica', 'Crônica', D.sessions.length], ['calendario', 'Calendário'], ['lugares', 'Lugares e notas', D.places.length + D.notes.length],
+  ...(GM || V.sect ? [['panorama', GM ? 'Panorama' : 'Minha seita']] : []), ...(GM ? [['divergencias', 'Kanka × Planilha', D.diverg.length]] : []), ...(P && P.owner ? [['painel', 'Painel do narrador']] : []), ...(window.__ATLAS && GM ? [['visibilidade', 'Visibilidade']] : [])];
+$('#nav').innerHTML = NAV.map(([k, l, n]) => `<a href="#${k}" data-k="${k}">${l}${n != null ? `<span>${n}</span>` : ''}</a>`).join('');
+
+const store = { get(k, d) { try { return JSON.parse(localStorage.getItem('nn-' + k)) ?? d } catch { return d } }, set(k, v) { try { localStorage.setItem('nn-' + k, JSON.stringify(v)) } catch {} } };
+let F = store.get('filtros', { q: '', sect: '', clan: '', cat: '', tipo: '', ord: 'idade' });
+
+/* ---------- início ---------- */
+function vInicio() {
+  const played = D.sessions.filter(s => s.ingame);
+  const last = D.sessions[D.sessions.length - 1];
+  const me = V.pc && byId['p-' + V.pc];
+  const top = D.chars.filter(c => !c.pc && c.role && /príncipe|senescal|governador|primig|xerife|líder|alfa|ceo|mentor/i.test(c.role)).slice(0, 8);
+  const lastNight = played[played.length - 1];
+  return `<div class="stack">
+    ${albumPromo()}
+    <div><div class="eyebrow">${esc(D.campaign.name)}</div><h1>${GM ? 'A cidade com Membros demais' : 'Bem-vindo de volta à noite'}</h1>
+    <p class="lede">${D.sessions.length} sessões jogadas. A crônica está na ${lastNight ? `noite ${lastNight.day} (${fmtDate(lastNight.ingame)})` : 'primeira noite'}.${me ? ` Você joga com <a href="#p-${me.id}">${esc(me.name)}</a>, da ${esc(me.sect)}.` : ''}</p></div>
+    <div class="two">
+      <section class="stack" style="gap:14px"><div class="eyebrow">Última sessão</div>
+        <a class="card" href="#c-${last.id}" style="flex-direction:row">
+          ${last.img ? `<div style="width:42%;flex:none"><img src="${last.img}" alt="" style="width:100%;height:100%;object-fit:cover;display:block"></div>` : ''}
+          <div class="bd"><div class="nm">${esc(cleanName(last.name))}</div><div class="night">${ingame(last)}</div>
+          <p class="meta" style="margin:6px 0 0">${esc(excerpt(last.html, 220))}</p></div></a>
+        ${top.length ? `<div class="eyebrow" style="margin-top:12px">Quem manda</div><div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(150px,1fr))">${top.map(card).join('')}</div>` : ''}
+      </section>
+      <section class="stack" style="gap:14px"><div class="eyebrow">Seitas</div>${sectTree()}
+        ${D.notes[0] ? `<a class="chip" href="#n-${D.notes[0].id}" style="align-self:flex-start">Contexto: ${esc(D.notes[0].name)}</a>` : ''}</section>
+    </div></div>`;
+}
+function sectTree() {
+  const row = o => `<a class="sect" href="#s-${o.id}">${emblem(o)}<div><div class="nm">${esc(o.name)}</div><div class="meta">${GM ? o.members.length + ' na planilha · ' : ''}${esc(o.attrs['Domínio'] || o.kind || '')}</div></div></a>`;
+  const roots = D.orgs.filter(o => !o.parent);
+  return `<div class="tree">${roots.map(o => o.children && o.children.length
+    ? `${row(o)}<details open><summary>${o.children.length} movimentos ligados aos ${esc(o.name)}</summary>${o.children.map(id => row(orgBy[id])).join('')}</details>` : row(o)).join('')}</div>`;
+}
+
+/* ---------- personagens ---------- */
+function card(c) {
+  const tags = [c.morte ? '<span class="chip priv">Destruído</span>' : '', c.own ? '<span class="chip pc">Você</span>' : (c.pc ? '<span class="chip pc">Jogador</span>' : ''), GM && c.kanka ? '<span class="chip k">Kanka</span>' : '', GM && c.kanka && c.kanka.private ? '<span class="chip priv">Privado</span>' : ''].join('');
+  return `<a class="card" href="#p-${c.id}"><div class="ph">${face(c)}</div><div class="bd"><div class="nm">${esc(c.name)}</div>
+    <div class="meta">${esc(c.clan || '—')}${c.cat ? ' · ' + esc(catShort(c.cat)) : ''}</div><div class="meta">${esc(c.sect || '')}${c.role ? ' · ' + esc(c.role) : ''}</div>
+    <div class="tags">${tags}</div></div></a>`;
+}
+const uniq = k => [...new Set(D.chars.map(c => c[k]).filter(Boolean))].sort((a, b) => String(a).localeCompare(String(b), 'pt'));
+function vPersonagens() {
+  const opt = (k, lab) => uniq(k).length ? `<select id="f-${k}" aria-label="${lab}"><option value="">${lab}: todos</option>${uniq(k).map(v => `<option ${F[k] === v ? 'selected' : ''}>${esc(v)}</option>`).join('')}</select>` : '';
+  return `<div class="stack"><div><div class="eyebrow">Elenco</div><h1>Personagens</h1>${GM ? '' : V.sect ? `<p class="lede">Membros da ${esc(V.sect)}, a coterie e quem já apareceu nas sessões.</p>` : '<p class="lede">Os personagens dos jogadores e quem já apareceu nas sessões.</p>'}</div>
+    <div class="filters"><input id="f-q" type="search" placeholder="Filtrar por nome ou cargo" value="${esc(F.q)}">${opt('sect', 'Seita')}${opt('clan', 'Clã')}${GM ? opt('cat', 'Categoria') : ''}
+    <select id="f-tipo" aria-label="Tipo"><option value="">Todos</option><option value="npc" ${F.tipo === 'npc' ? 'selected' : ''}>Só NPCs</option><option value="pc" ${F.tipo === 'pc' ? 'selected' : ''}>Só jogadores</option>${GM ? `<option value="kanka" ${F.tipo === 'kanka' ? 'selected' : ''}>Com página no Kanka</option>` : ''}</select>
+    <select id="f-ord" aria-label="Ordenar">${GM ? `<option value="idade" ${F.ord === 'idade' ? 'selected' : ''}>Mais antigos primeiro</option>` : ''}<option value="nome" ${F.ord === 'nome' ? 'selected' : ''}>Nome</option>${GM ? `<option value="xp" ${F.ord === 'xp' ? 'selected' : ''}>Mais XP</option>` : ''}</select></div>
+    <div class="count" id="cnt"></div><div class="grid" id="cards"></div></div>`;
+}
+function drawCards() {
+  let L = D.chars.filter(c => (!F.sect || c.sect === F.sect) && (!F.clan || c.clan === F.clan) && (!F.cat || c.cat === F.cat)
+    && (!F.tipo || (F.tipo === 'pc' ? c.pc : F.tipo === 'npc' ? !c.pc : !!c.kanka))
+    && (!F.q || norm(c.name + ' ' + (c.role || '')).includes(norm(F.q))));
+  if (F.ord === 'nome' || !GM) L.sort((a, b) => a.name.localeCompare(b.name, 'pt'));
+  else if (F.ord === 'xp') L.sort((a, b) => (b.xp || 0) - (a.xp || 0));
+  $('#cnt').textContent = `${L.length} de ${D.chars.length} personagens`;
+  $('#cards').innerHTML = L.map(card).join('') || '<p class="lede">Nenhum personagem com esses filtros.</p>';
+}
+function gallery(items) {
+  return `<div class="gal">${items.map(f => `<button type="button" data-zoom="${f}" aria-label="Ampliar imagem"><img src="${f}" alt="" loading="lazy"></button>`).join('')}</div>`;
+}
+function vPersonagem(c) {
+  const k = c.kanka || {};
+  const full = GM || c.own;
+  const facts = [];
+  if (full && !c.especie) facts.push(['Idade', c.age != null ? c.age + ' anos' : '—'], ['Geração', c.gen ? c.gen + 'ª' : '—'], ['Categoria', catShort(c.cat) || '—'], ['Pot. de Sangue', c.bp ?? '—'], ['XP', c.xp ?? '—']);
+  if (GM && !c.pc && c.arch) facts.push(['Arquétipo', c.arch], ['Perfil', c.perfil || '—'], ['Predador', c.pred || '—']);
+  const extra = [...(k.extra ? Object.entries(k.extra) : []), ...(c.obs_aparente ? [['Idade aparente', c.obs_aparente]] : []), ...(c.aparente ? [['Idade aparente', c.aparente]] : [])];
+  const plink = x => x.id ? `<a href="#p-${x.id}">${esc(x.n)}</a>` : esc(x.n);
+  const extraH = [];
+  if (GM && c.senhor) extraH.push(['Senhor', `${plink(c.senhor)} <span class="count">${esc(c.senhor.tipo)}</span>`]);
+  if (GM && !c.senhor && c.senhor_diab) extraH.push(['Senhor', `<span class="count">nenhum 1 geração acima; possível senhor diablerista: </span>${c.senhor_diab.map(plink).join(', ')}`]);
+  if (GM && !c.senhor && c.senhor_cruz) extraH.push(['Senhor', `<span class="count">só em outra seita: </span>${c.senhor_cruz.map(plink).join(', ')}`]);
+  if (GM && c.diablerista) extraH.push(['Diablerie', `<span class="chip priv">Diablerista</span> <span class="count">era ${c.diablerista}ª geração antes</span>`]);
+  if (GM && c.crias) extraH.push(['Crias', c.crias.map(x => plink(x) + (x.tipo !== 'conhecido' ? ' <span class="count">*</span>' : '')).join(', ')]);
+  if (GM && c.afin && (c.afin[0] || c.afin[1])) extra.push(['Afinidades', c.afin.filter(Boolean).map((x, i) => x + (i ? ' (+5)' : ' (+10)')).join(' · ')]);
+  const ses = (c.sessions || []).map(id => sesBy[id]).filter(Boolean);
+  const gal = [...(c.full ? [c.full] : []), ...(c.gallery || []).map(g => g.file)];
+  const fichaPanel = c.attrs ? sheetHtml(c) : (c.pc && full ? pcSheet(c) : (GM ? (c.especie ? `<p class="note">${esc(c.especie)}: a planilha calcula só vampiros, então não há ficha aqui.</p>` : c.morte ? '<p class="note">Destruído na crônica, por isso não está na planilha nem no Kanka.</p>' : '<p class="note">Este personagem não está na planilha, então ainda não tem ficha calculada.</p>') : ''));
+  const obs = (c.obs || []).length ? `<details class="post obs" ${k.entry || (k.posts || []).length ? '' : 'open'}><summary>Anotações antigas <span class="chip k">Obsidian</span></summary><div class="prose">${c.obs.map(o => `<h4>${esc(o.t)}</h4>${o.html}`).join('')}</div></details>` : '';
+  const sd = c.sectdesc ? `<div class="note" style="border-color:var(--blood);background:var(--blood-soft);max-width:none"><div class="eyebrow" style="margin-bottom:4px">Segundo ${/contenda|camarilla/i.test(c.sectdesc.org) ? 'a' : 'os'} ${esc(c.sectdesc.org)}</div><div class="prose" style="font-size:15.5px">${c.sectdesc.html}</div></div>` : '';
+  const hist = (c.nota || k.entry || (k.posts || []).length || obs || sd) ? `${c.nota ? `<div class="prose">${c.nota}</div>` : ''}${k.entry ? `<div class="prose">${k.entry}</div>` : ''}${(k.posts || []).map(p => `<details class="post"><summary>${esc(p.name)}${GM && p.private ? ' <span class="chip priv">Privado</span>' : ''}</summary><div class="prose">${p.html}</div></details>`).join('')}${sd}${obs}` : '';
+  const R = relsOf(c);
+  const tabs = [fichaPanel && ['ficha', 'Ficha'], GM && c.vant && ['vant', 'Vantagens e poderes'], (c.pc || R.length) && ['relacoes', 'Relações'], hist && ['historia', 'História'], gal.length && ['galeria', `Imagens (${gal.length})`], ['cronica', `Na crônica (${ses.length})`]].filter(Boolean);
+  const body = { ficha: fichaPanel, vant: GM && c.vant ? vantHtml(c) : '', relacoes: egoMap(c, R), historia: `<div class="stack" style="gap:14px">${hist}</div>`, galeria: gallery(gal),
+    cronica: ses.length ? `<div class="timeline">${ses.map(sesItem).join('')}</div>` : '<p class="lede">Ainda não aparece pelo nome em nenhuma sessão.</p>' };
+  return `<div class="stack">
+    <div class="hero"><div class="portrait">${c.full ? `<button type="button" data-zoom="${c.full}" style="all:unset;cursor:zoom-in;display:block;width:100%;height:100%">${face(c)}</button>` : face(c)}</div>
+      <div class="stack" style="gap:16px">
+        <div><div class="eyebrow">${esc(c.clan || 'Clã desconhecido')}${k.title ? ' · ' + esc(k.title) : ''}</div><h1>${esc(c.name)}</h1></div>
+        <div class="row">${sectLink(c.sect)}${c.role ? `<span class="chip">${esc(c.role)}</span>` : ''}${c.own ? '<span class="chip pc">Seu personagem</span>' : c.pc ? '<span class="chip pc">Jogador</span>' : ''}${GM && k.private ? '<span class="chip priv">Privado no Kanka</span>' : ''}${GM && !c.kanka ? '<span class="chip k">Sem página no Kanka</span>' : ''}${c.morte ? `<a class="chip priv" href="#c-${c.morte.s}">Destruído · ${esc(cleanName((sesBy[c.morte.s] || {}).name || ''))}</a>` : GM && (c.src || []).join() === 'obsidian' ? '<span class="chip k">Só no Obsidian (fora da planilha)</span>' : ''}</div>
+        ${facts.length ? `<dl class="facts">${facts.map(([a, b]) => `<div><dt>${a}</dt><dd>${esc(b)}</dd></div>`).join('')}</dl>` : ''}
+        ${extra.length || extraH.length ? `<dl class="kv">${extra.map(([a, b]) => `<dt>${esc(a)}</dt><dd>${esc(b)}</dd>`).join('')}${extraH.map(([a, b]) => `<dt>${esc(a)}</dt><dd>${b}</dd>`).join('')}</dl>` : ''}
+        ${k.memb && k.memb.length ? `<div class="row"><span class="eyebrow">Afiliação</span>${k.memb.map(m => `<a class="chip" href="#s-${m.org}">${esc(m.orgname)}${m.role ? ' · ' + esc(m.role) : ''}</a>`).join('')}</div>` : ''}
+        ${window.__ATLAS && GM && !c.pc ? window.__ATLAS.visRow(c) : ''}
+        ${GM && c.morte && c.morte.gm ? `<p class="note" style="border-color:var(--blood)">${esc(c.morte.gm)}</p>` : ''}
+        ${!full ? '<p class="count">Ficha, história, idade real e XP ficam com o narrador.</p>' : ''}
+      </div></div>
+    <div class="tabs" role="tablist">${tabs.map(([id, l], i) => `<button role="tab" data-tab="${id}" class="${i === 0 ? 'on' : ''}">${l}</button>`).join('')}</div>
+    ${tabs.map(([id], i) => `<section data-panel="${id}" ${i ? 'hidden' : ''}>${body[id]}</section>`).join('')}
+  </div>`;
+}
+function playerSheet(c, f = c.ficha) {
+  const G = D.groups, cols = ['Físicos', 'Sociais', 'Mentais'];
+  const lbl = { 'Constituição': 'Vigor' };
+  const col = (title, list, src, specs) => `<div class="col"><div class="ct">${title}</div>${list.map(t => `<div class="tr ${src[t] ? '' : 'z'}"><span>${esc(lbl[t] || t)}${specs && specs[t] ? ` <em class="spec">${esc(specs[t])}</em>` : ''}</span>${dots(src[t] || 0)}</div>`).join('')}</div>`;
+  const list = (title, L) => `<div class="col"><div class="ct">${title}</div>${L.length ? L.map(([n, v]) => `<div class="tr ${v ? '' : 'z'}"><span>${esc(n)}</span>${dots(v)}</div>`).join('') : '<span class="count">—</span>'}</div>`;
+  const kv = [['Conceito', f.conceito], ['Predador', f.predador], ['Senhor', f.senhor], ['Geração', f.geracao && f.geracao + 'ª'], ['Ambição', f.ambicao], ['Desejo', f.desejo],
+    ['Idade verdadeira', f.idade_real], ['Idade aparente', f.idade_aparente], ['Nascimento', f.nascimento],
+    ['Surto de Sangue', f.surto], ['Quantidade recuperada', f.recup], ['Bônus de poder', f.bonus], ['Rerrolagem', f.rerrol], ['Penalidade de alimentação', f.penal], ['Gravidade da Perdição', f.gravidade]].filter(([, v]) => v !== '' && v != null);
+  const txt = [['Princípios da crônica', f.principios], ['Pilares e convicções', f.pilares], ['Perdição do clã', f.perdicao], ['Compulsões', f.compulsao], ['Aparência', f.aparencia], ['Traços distintivos', f.tracos], ['Ambição anterior', f.ambicao_anterior], ['Notas', f.notas]].filter(([, v]) => v);
+  const tr = (l, n, max, cls) => n == null ? `<div class="t"><span class="eyebrow">${l} · —</span><span class="count">não preenchido na ficha</span></div>` : `<div class="t"><span class="eyebrow">${l} · ${n}</span>${boxes(n, max, cls)}</div>`;
+  return `<div class="stack" style="gap:8px">
+    <p class="note">Transcrita da ficha enviada pelo jogador${f.frente ? '' : ' (só veio o verso e as disciplinas; atributos e habilidades ficaram de fora)'}. Pode estar desatualizada em relação às últimas sessões.</p>
+    <div class="trackers">${tr('Vitalidade', f.vit, 10, '')}${tr('Força de Vontade', f.fdv, 10, 'wp')}${tr('Humanidade', f.hum, 10, 'hu')}${tr('Fome', f.fome, 5, '')}</div>
+    <div class="sheet">
+      ${f.frente ? `<h4>Atributos</h4>${G.attrs.map((l, i) => col(cols[i], l, f.attrs)).join('')}
+      <h4>Habilidades</h4>${G.skills.map((l, i) => col(cols[i], l, f.skills, f.specs)).join('')}`
+      : `<h4>Habilidades anotadas</h4><div class="col">${Object.entries(f.skills).map(([t, v]) => `<div class="tr"><span>${esc(t)}${f.specs[t] ? ` <em class="spec">${esc(f.specs[t])}</em>` : ''}</span>${dots(v)}</div>`).join('')}</div>`}
+      <h4>Disciplinas</h4>${f.discs.map(([n, v, P]) => `<div class="col"><div class="tr"><span><b>${esc(n)}</b></span>${dots(v)}</div>${P.map(([p, l]) => `<div class="tr z"><span>${esc(p)}</span><span class="count">nv ${l}</span></div>`).join('')}</div>`).join('')}
+      <h4>Vantagens e defeitos</h4>${list('Vantagens', f.vantagens)}${list('Defeitos', f.defeitos)}
+      <div class="col"><div class="tr"><span>Potência de Sangue</span>${dots(f.bp)}</div><div class="tr z"><span>XP na ficha</span><span class="xp">${f.xp_total} total · ${f.xp_gasto} gasto</span></div></div>
+    </div>
+    ${kv.length ? `<dl class="kv" style="margin-top:14px">${kv.map(([a, b]) => `<dt>${esc(a)}</dt><dd>${esc(String(b))}</dd>`).join('')}</dl>` : ''}
+    ${txt.map(([a, b]) => `<div style="margin-top:10px"><div class="eyebrow" style="margin-bottom:4px">${a}</div><div class="prose" style="white-space:pre-line">${esc(b)}</div></div>`).join('')}
+  </div>`;
+}
+function pcSheet(c) {
+  if (P && c.own) return portalSheet(c);
+  const x = c.xp_campanha || { total: c.xp, items: [] };
+  return `<div class="stack" style="gap:18px">
+    ${c.ficha ? `<details class="post" open><summary>Ficha do jogador</summary>${playerSheet(c)}</details>` : ''}
+    <div><div class="eyebrow">XP de campanha</div><div style="font-family:var(--display);font-size:40px">${x.total} <span class="count">XP somados das sessões</span></div></div>
+    <div class="tbl"><table class="data"><thead><tr><th>Sessão</th><th>Noite</th><th class="n">XP</th><th class="n">Acumulado</th></tr></thead><tbody>
+    ${(() => { let acc = 0; return x.items.map(i => { const s = sesBy[i.s]; acc += i.xp; return `<tr class="link" data-go="c-${s.id}" tabindex="0"><td>${esc(cleanName(s.name))}</td><td class="night">${s.ingame ? 'Noite ' + s.day : '—'}</td><td class="n">${i.xp}</td><td class="n">${acc}</td></tr>`; }).join(''); })()}
+    </tbody></table></div>
+    ${c.fichas && c.fichas.length ? `<div><div class="eyebrow" style="margin-bottom:8px">Imagem original da ficha</div>${gallery(c.fichas)}</div>` : ''}</div>`;
+}
+function vantHtml(c) {
+  const v = c.vant, sum = L => L.reduce((a, x) => a + x.pts, 0);
+  const row = x => `<div class="tr vt"><span>${esc(x.n)}${x.foco ? ` <em class="spec">${esc(x.foco)}</em>` : ''}${x.motivo ? `<small>${esc(x.motivo)}</small>` : ''}</span>${dots(x.pts, Math.max(5, x.pts))}</div>`;
+  const p = v.predador;
+  const pod = Object.entries(v.poderes).sort((a, b) => b[1].length - a[1].length);
+  return `<div class="stack" style="gap:10px">
+    <p class="note">${v.base === 'lore' ? 'Escolhidas a partir da lore, completadas por arquétipo, clã e seita.' : 'Ainda sem lore: versão básica guiada por arquétipo, clã e seita, nessa ordem.'}
+      Orçamento da categoria: ${v.orc.v} pontos de vantagem e ${v.orc.d} de defeito. O pacote do tipo de predador vem por fora, como na criação.</p>
+    <div class="sheet vant">
+      <h4>Vantagens · ${sum(v.vantagens)} de ${v.orc.v}</h4><div class="col" style="grid-column:1/-1">${v.vantagens.map(row).join('')}</div>
+      <h4>Defeitos · ${sum(v.defeitos)} de ${v.orc.d}</h4><div class="col" style="grid-column:1/-1">${v.defeitos.map(row).join('')}</div>
+      ${p ? `<h4>Tipo de predador · ${esc(p.pt)} (${esc(p.tipo)})</h4><div class="col" style="grid-column:1/-1">
+        <div class="tr vt"><span>Especialidade</span><span class="spec">${esc(p.especialidade)}</span></div>
+        <div class="tr vt"><span>Disciplina do predador</span><span class="spec">${esc(p.disciplina)} (+1)</span></div>
+        ${p.vantagens.map(row).join('')}${p.defeitos.map(x => row(Object.assign({}, x, {n: x.n + ' (defeito)'}))).join('')}
+        ${p.humanidade ? `<div class="tr vt"><span>Humanidade</span><span class="spec">${p.humanidade > 0 ? '+' : ''}${p.humanidade}</span></div>` : ''}
+        ${p.potencia ? `<div class="tr vt"><span>Potência de Sangue</span><span class="spec">+${p.potencia}</span></div>` : ''}</div>` : ''}
+      <h4>Poderes · um por ponto de disciplina</h4>
+      ${pod.map(([d, L]) => `<div class="col"><div class="ct">${esc(d)} ${dots(L.length)}</div>${L.map(x => `<div class="tr vt"><span><b class="lv">${x.l}</b> ${esc(x.n)}${x.am || x.pre ? `<small>${x.am ? 'amálgama: ' + esc(x.am) : ''}${x.am && x.pre ? ' · ' : ''}${x.pre ? 'requer ' + esc(x.pre) : ''}</small>` : ''}<small class="en">${esc(x.en)}</small></span></div>`).join('')}</div>`).join('')}
+      ${v.extras.length ? `<div class="col"><div class="ct">Ritual / cerimônia</div>${v.extras.map(e => `<div class="tr vt"><span>${esc(e.n)}<small>${esc(e.tipo)}</small><small class="en">${esc(e.en)}</small></span></div>`).join('')}</div>` : ''}
+    </div></div>`;
+}
+function sheetHtml(c) {
+  const G = D.groups, cols = ['Físicos', 'Sociais', 'Mentais'];
+  const col = (title, list, src) => `<div class="col"><div class="ct">${title}</div>${list.map(t => `<div class="tr ${src[t] ? '' : 'z'}"><span>${esc(t)}</span>${dots(src[t] || 0)}</div>`).join('')}</div>`;
+  const disc = Object.entries(c.discs).sort((a, b) => b[1] - a[1]);
+  return `<div class="stack" style="gap:6px">
+    <div class="trackers">
+      <div class="t"><span class="eyebrow">Vitalidade · ${c.vigor}</span>${boxes(c.vigor, Math.max(10, c.vigor), '')}</div>
+      <div class="t"><span class="eyebrow">Força de Vontade · ${c.wp}</span>${boxes(c.wp, 10, 'wp')}</div>
+      <div class="t"><span class="eyebrow">Humanidade · ${c.hum}</span>${boxes(c.hum, 10, 'hu')}</div>
+    </div>
+    <div class="sheet"><h4>Atributos</h4>${G.attrs.map((l, i) => col(cols[i], l, c.attrs)).join('')}
+    <h4>Habilidades</h4>${G.skills.map((l, i) => col(cols[i], l, c.skills)).join('')}
+    <h4>Disciplinas</h4><div class="col">${disc.map(([t, v]) => `<div class="tr"><span>${esc(t)}</span>${dots(v)}</div>`).join('')}</div>
+    <div class="col"><div class="tr"><span>Potência de Sangue</span>${dots(c.bp, Math.max(5, c.bp))}</div></div>
+    <div class="col"><div class="tr z"><span>XP sem uso</span><span class="xp">${c.xpleft} de ${c.xp}</span></div></div></div></div>`;
+}
+function sesItem(s) {
+  return `<a class="ses" href="#c-${s.id}"><div><div class="night">${ingame(s)}</div><h3>${esc(cleanName(s.name))}</h3><p>${esc(excerpt(s.html, 180))}</p></div>${s.img ? `<img src="${s.img}" alt="" loading="lazy">` : '<span></span>'}</a>`;
+}
+
+/* ---------- seitas ---------- */
+function vSeitas() {
+  return `<div class="stack"><div><div class="eyebrow">Política da cidade</div><h1>Seitas e movimentos</h1>
+    <p class="lede">Os Anarchs não têm líder único: seis movimentos dividem a cidade sob a mesma bandeira. Clique para abrir ou fechar.</p></div>${sectTree()}</div>`;
+}
+const CAM_OFFICES = [
+  ['Senescal', /ventrue/i, /senescal/i, 'Ventrue'],
+  ['Diplomata', /toreador/i, /diplomat/i, 'Toreador'],
+  ['Oráculo', /malkav/i, /oráculo|orácul/i, 'Malkaviano'],
+  ['Mestre de Armas', /gangrel|nosferatu|brujah/i, /mestre de armas/i, 'Gangrel · Nosferatu · Brujah'],
+  ['Administradora de Vitae', /hecata|lasombra|tremere/i, /vitae/i, 'Hecata · Lasombra · Tremere'],
+  ['Executor', null, /executor/i, 'Demais clãs']];
+const officeOf = clan => (CAM_OFFICES.find(o => o[1] && o[1].test(clan || '')) || CAM_OFFICES[CAM_OFFICES.length - 1]);
+let CAM_MODE = 'cargos';
+function clanHierarchy(o) {
+  const M = D.chars.filter(c => c.sect === o.sheet_name);
+  const node = (c, top) => `<a class="node ${top ? 'top' : ''}" href="#p-${c.id}"><span class="av">${face(c)}</span><span class="nm">${esc(c.name)}</span><span class="rl">${esc(c.role || '')} · ${esc(c.clan || '')}</span></a>`;
+  const prince = M.filter(c => /príncipe/i.test(c.role || ''));
+  const cards = CAM_OFFICES.map(([title, , rx, clans]) => {
+    const lead = M.find(c => rx.test(c.role || '') && !prince.includes(c));
+    const mem = M.filter(c => officeOf(c.clan)[0] === title && c !== lead && !prince.includes(c));
+    const unk = GM ? PEND.filter(p => p.sect === o.sheet_name && officeOf(p.clan)[0] === title) : [];
+    return `<section class="card" style="padding:16px;gap:12px;align-items:center">
+      <div style="text-align:center"><div style="font-family:var(--display);font-size:20px">${esc(title)}</div><div class="eyebrow" style="color:var(--blood)">${esc(clans)}</div></div>
+      ${lead ? node(lead, true) : '<div class="count">Cargo sem primigênie</div>'}
+      ${mem.length || unk.length ? `<div class="link-v" style="height:14px"></div><div style="display:flex;flex-wrap:wrap;justify-content:center;gap:10px">${mem.map(c => node(c)).join('')}${unk.map(unknownNode).join('')}</div>` : '<div class="count">Nenhum membro desses clãs</div>'}</section>`;
+  }).join('');
+  return `<div class="org">${prince.length ? `<div class="tier"><div class="lab">Príncipe</div><div class="nodes">${prince.map(c => node(c, true)).join('')}</div></div><div class="link-v"></div>` : ''}</div>
+    <div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(260px,1fr))">${cards}</div>`;
+}
+function hierarchy(o) {
+  if (o.sheet_name === 'Camarilla' && o.tiers && o.tiers.length) {
+    AFTER.push(() => document.querySelectorAll('[data-cam]').forEach(b => b.addEventListener('click', () => { CAM_MODE = b.dataset.cam; document.querySelector('#camh').innerHTML = CAM_MODE === 'clas' ? clanHierarchy(o) : tierHierarchy(o); document.querySelectorAll('[data-cam]').forEach(x => x.classList.toggle('on', x === b)); })));
+    return `<div class="stack" style="gap:16px"><div class="tabs" style="border:0">${[['cargos', 'Por cargos da corte'], ['clas', 'Por clãs']].map(([k, l]) => `<button type="button" data-cam="${k}" class="${CAM_MODE === k ? 'on' : ''}">${l}</button>`).join('')}</div>
+      <p class="count">Por clãs: cada clã responde a um primigênie da corte, mesmo que não seja do mesmo sangue. Ventrue ao Senescal; Toreador à Diplomata; Malkaviano ao Oráculo; Gangrel, Nosferatu e Brujah ao Mestre de Armas; Hecata, Lasombra e Tremere à Administradora de Vitae; os demais ao Executor.</p>
+      <div id="camh">${CAM_MODE === 'clas' ? clanHierarchy(o) : tierHierarchy(o)}</div></div>`;
+  }
+  return tierHierarchy(o);
+}
+const PEND = (D.pendentes || []);
+function unknownNode(p) { return `<span class="node unk" title="${esc(p.id)} · ${esc(p.arch)} · ${p.age} anos"><span class="av"><div class="mono-ph" aria-hidden="true">?</div></span><span class="nm">Desconhecido</span><span class="rl">${esc(p.clan)} · ${esc(catShort(p.cat))}</span></span>`; }
+function unknownTier(sect, label = 'Ainda por criar') {
+  const L = GM ? PEND.filter(p => p.sect === sect).sort((a, b) => b.cat.localeCompare(a.cat) || a.clan.localeCompare(b.clan, 'pt')) : [];
+  return L.length ? `<div class="link-v"></div><div class="tier"><div class="lab">${label} · ${L.length}</div><div class="nodes">${L.map(unknownNode).join('')}</div></div>` : '';
+}
+function tierHierarchy(o) {
+  if (o.children && o.children.length) {
+    return `<div class="org"><div class="tier"><div class="nodes"><span class="node top"><span class="av">${emblem(o)}</span><span class="nm">${esc(o.name)}</span></span></div></div><div class="link-v"></div>
+      <div class="tier"><div class="lab">Movimentos</div><div class="nodes">${o.children.map(id => { const x = orgBy[id]; const lead = x.tiers && x.tiers[0] ? byId['p-' + x.tiers[0].ids[0]] : null;
+        return `<a class="node" href="#s-${x.id}"><span class="av">${emblem(x)}</span><span class="nm">${esc(x.name)}</span>${lead ? `<span class="rl">${esc(lead.name)}</span>` : ''}</a>`; }).join('')}</div></div></div>`;
+  }
+  if (!o.tiers || !o.tiers.length) return GM ? (PEND.some(p => p.sect === o.sheet_name) ? `<div class="org">${unknownTier(o.sheet_name).replace('<div class="link-v"></div>', '')}</div>` : '<p class="lede">Sem membros na planilha para montar a hierarquia.</p>') : '<p class="lede">A hierarquia desta seita não é conhecida pela sua personagem.</p>';
+  return `<div class="org">${o.tiers.map((t, i) => `${i ? '<div class="link-v"></div>' : ''}<div class="tier"><div class="lab">${esc(t.label)}</div><div class="nodes">
+    ${t.ids.map(id => byId['p-' + id]).filter(Boolean).map(c => `<a class="node ${i === 0 ? 'top' : ''}" href="#p-${c.id}"><span class="av">${face(c)}</span><span class="nm">${esc(c.name)}</span><span class="rl">${esc(c.role || '')} · ${esc(c.clan || '')}</span></a>`).join('')}</div></div>`).join('')}${unknownTier(o.sheet_name)}</div>`;
+}
+function vSeita(o) {
+  const M = o.members.map(id => byId['p-' + id]).filter(Boolean);
+  const parent = o.parent && orgBy[o.parent];
+  const attrs = Object.entries(o.attrs);
+  const showTree = (o.children && o.children.length) || (o.tiers && o.tiers.length) || GM;
+  const T = (D.territory || []).filter(b => b.seita === o.sheet_name);
+  const tabs = [['geral', 'Visão geral'], showTree && ['hierarquia', 'Hierarquia'], (T.length || o.children) && ['territorio', 'Território'], ['membros', `Membros conhecidos (${M.length})`]].filter(Boolean);
+  const body = {
+    geral: `<div class="two"><div class="stack" style="gap:14px"><div class="prose">${o.entry}</div>
+      ${o.posts.map(p => `<details class="post"><summary>${esc(p.name)}${GM && p.private ? ' <span class="chip priv">Privado</span>' : ''}</summary><div class="prose">${p.html}</div></details>`).join('')}
+      ${o.obs ? `<details class="post obs"><summary>Anotações antigas <span class="chip k">Obsidian</span></summary><div class="prose">${o.obs}</div></details>` : ''}</div>
+      <aside class="stack" style="gap:18px">${attrs.length ? `<dl class="kv">${attrs.map(([a, b]) => `<dt>${esc(a)}</dt><dd>${esc(b)}${(o.obs_attrs || []).includes(a) ? ' <span class="chip k" title="Veio das anotações do Obsidian">Obsidian</span>' : ''}</dd>`).join('')}</dl>` : ''}
+      ${o.children && o.children.length ? `<div class="stack" style="gap:8px"><div class="eyebrow">Movimentos</div>${o.children.map(id => `<a class="sect" href="#s-${id}">${emblem(orgBy[id])}<div><div class="nm">${esc(orgBy[id].name)}</div><div class="meta">${esc(orgBy[id].attrs['Domínio'] || '')}</div></div></a>`).join('')}</div>` : ''}</aside></div>`,
+    hierarquia: hierarchy(o),
+    territorio: territorio(o, T),
+    membros: M.length ? `<div class="grid">${M.map(card).join('')}</div>` : '<p class="lede">Nenhum membro conhecido.</p>' };
+  return `<div class="stack">
+    ${parent ? `<div class="crumbs"><a href="#seitas">Seitas</a>›<a href="#s-${parent.id}">${esc(parent.name)}</a>›<span>${esc(o.name)}</span></div>` : '<div class="crumbs"><a href="#seitas">Seitas</a>›<span>' + esc(o.name) + '</span></div>'}
+    <div class="row" style="gap:18px;align-items:center">${(o.emblem || o.img) ? `<img src="${o.emblem || o.img}" alt="" style="width:84px;height:84px;object-fit:contain;border-radius:8px;padding:6px;box-sizing:border-box;background:${o.ebg || '#fff'}">` : ''}
+      <div><div class="eyebrow">${esc(o.kind || 'Facção')}${o.own ? ' · sua seita' : ''}</div><h1>${esc(o.name)}</h1></div></div>
+    <div class="tabs" role="tablist">${tabs.map(([id, l], i) => `<button role="tab" data-tab="${id}" class="${i === 0 ? 'on' : ''}">${l}</button>`).join('')}</div>
+    ${tabs.map(([id], i) => `<section data-panel="${id}" ${i ? 'hidden' : ''}>${body[id]}</section>`).join('')}</div>`;
+}
+
+/* ---------- crônica e calendário ---------- */
+function vCronica() {
+  const tot = D.sessions.reduce((a, s) => a + (s.xp || 0), 0);
+  return `<div class="stack"><div><div class="eyebrow">Diário de campanha</div><h1>Crônica</h1><p class="lede">${D.sessions.length} sessões, ${tot} XP distribuídos para a coterie.</p></div>
+    <div class="timeline">${D.sessions.slice().reverse().map(sesItem).join('')}</div></div>`;
+}
+function vSessao(s) {
+  const prev = D.sessions[s.n - 1], next = D.sessions[s.n + 1];
+  const who = D.chars.filter(c => (c.sessions || []).includes(s.id));
+  return `<div class="stack">${s.img ? `<img class="banner" src="${s.img}" alt="">` : ''}
+    <div><div class="night">${ingame(s)}${s.period ? ' · ' + esc(s.period) : ''}</div><h1>${esc(cleanName(s.name))}</h1>
+    <div class="count">Jogada em ${s.played ? fmtDate(s.played) : 'data não registrada'} · <span class="xp">${s.xp ?? '—'} XP</span></div></div>
+    ${who.length ? `<div class="row"><span class="eyebrow">Citados</span>${who.map(c => `<a class="chip" href="#p-${c.id}">${esc(c.name)}</a>`).join('')}</div>` : ''}
+    <div class="prose">${s.html}</div>${s.gallery && s.gallery.length ? gallery(s.gallery) : ''}
+    <div class="pager">${prev ? `<a href="#c-${prev.id}"><small class="eyebrow">Anterior</small>${esc(cleanName(prev.name))}</a>` : '<span></span>'}${next ? `<a href="#c-${next.id}" style="text-align:right"><small class="eyebrow">Próxima</small>${esc(cleanName(next.name))}</a>` : '<span></span>'}</div></div>`;
+}
+function vCalendario() {
+  const start = dt(D.calendar.start);
+  const days = D.sessions.filter(s => s.ingame);
+  const last = days.length ? dt(days[days.length - 1].ingame) : start;
+  const first = new Date(start.getFullYear(), start.getMonth(), 1);
+  const lastM = new Date(last.getFullYear(), last.getMonth() + 1, 0);
+  const g0 = new Date(first); g0.setDate(1 - first.getDay());
+  const cells = [];
+  for (let d = new Date(g0); d <= lastM || d.getDay() !== 0; d.setDate(d.getDate() + 1)) {
+    const iso = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    const ss = days.filter(s => s.ingame === iso);
+    const nightN = Math.round((d - start) / 864e5);
+    cells.push(`<div class="d ${d.getMonth() !== start.getMonth() && d > lastM ? 'out' : ''} ${ss.length ? 'hit' : ''}"><span class="n">${d.getDate()}${nightN >= 0 && nightN <= (days.length ? days[days.length - 1].day : 0) ? ` · N${nightN}` : ''}</span>${ss.map(s => `<a href="#c-${s.id}">${esc(cleanName(s.name).replace(/^\d+\s*[-—]\s*/, ''))}</a>`).join('')}</div>`);
+  }
+  const pend = D.sessions.filter(s => !s.ingame);
+  return `<div class="stack"><div><div class="eyebrow">Tempo dentro do jogo</div><h1>Calendário da crônica</h1>
+    <p class="lede">A história começa na noite de ${DIAS[start.getDay()]}, ${fmtDate(D.calendar.start)}. Cada célula marcada é uma noite jogada; “N” é o número da noite.</p></div>
+    <h2>${['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'][start.getMonth()]} de ${start.getFullYear()}</h2>
+    <div class="tbl"><div class="cal" style="min-width:560px">${DIAS.map(d => `<div class="dh">${d.slice(0, 3).toUpperCase()}</div>`).join('')}${cells.join('')}</div></div>
+    <div class="tbl"><table class="data"><thead><tr><th>Sessão</th><th>Noite</th><th>Data in-game</th><th>Jogada em</th></tr></thead><tbody>
+    ${D.sessions.map(s => `<tr class="link" data-go="c-${s.id}" tabindex="0"><td>${esc(cleanName(s.name))}</td><td class="night">${s.ingame ? s.day : '—'}</td><td>${s.ingame ? `${DIAS[dt(s.ingame).getDay()]}, ${fmtDate(s.ingame)}${s.period ? ' · ' + esc(s.period) : ''}` : 'a definir'}</td><td>${s.played ? fmtDate(s.played) : '—'}</td></tr>`).join('')}</tbody></table></div>
+    ${pend.length ? `<p class="note">Sem data in-game: ${pend.map(s => esc(cleanName(s.name))).join(', ')}.</p>` : ''}</div>`;
+}
+
+/* ---------- lugares, panorama, divergências ---------- */
+function vLugares() {
+  const items = [...D.places.map(p => ['l-' + p.id, p.name, p.kind, [p.sect, p.bairro].filter(Boolean).join(' · ') || p.title, p.img]), ...D.notes.map(n => ['n-' + n.id, n.name, n.kind, GM && n.private ? 'Privado' : '', null])];
+  return `<div class="stack"><div><div class="eyebrow">Mundo</div><h1>Lugares e notas</h1></div>
+    <div class="grid">${items.map(([h, n, k, t, img]) => `<a class="card" href="#${h}">${img ? `<div class="ph" style="aspect-ratio:3/2"><img src="${img}" alt="" loading="lazy"></div>` : ''}<div class="bd"><div class="nm">${esc(n)}</div><div class="meta">${esc(k || '')}${t ? ' · ' + esc(t) : ''}</div></div></a>`).join('')}</div>
+    ${D.loose && D.loose.length ? `<h2>Imagens sem dono</h2>${gallery(D.loose.map(x => x.file))}` : ''}</div>`;
+}
+function vTexto(x, kind) {
+  return `<div class="stack">${x.img ? `<img class="banner" src="${x.img}" alt="">` : ''}<div><div class="eyebrow">${esc(kind)}${x.kind && x.kind !== kind ? ' · ' + esc(x.kind) : ''}</div><h1>${esc(x.name)}</h1>${x.title ? `<p class="lede">${esc(x.title)}</p>` : ''}</div>
+    ${GM && x.private ? '<span class="chip priv" style="align-self:flex-start">Privado no Kanka</span>' : ''}${GM && x.gm ? '<span class="chip priv" style="align-self:flex-start">Só o narrador vê</span>' : ''}${x.html ? `<div class="prose">${x.html}</div>` : '<p class="lede">Ainda sem descrição.</p>'}</div>`;
+}
+function bars(obj, keep) {
+  const mx = Math.max(1, ...Object.values(obj));
+  return `<div class="bars">${Object.entries(obj).sort((a, b) => keep ? 0 : b[1] - a[1]).map(([k, n]) => `<div class="bar"><span>${esc(k)}</span><span class="tk"><b style="width:${n / mx * 100}%"></b></span><span class="n">${n}</span></div>`).join('')}</div>`;
+}
+function vPanorama() {
+  if (!GM) {
+    const o = orgBySheet[V.sect]; const M = D.chars.filter(c => c.sect === V.sect);
+    const cl = {}; M.forEach(c => cl[c.clan] = (cl[c.clan] || 0) + 1);
+    return `<div class="stack"><div><div class="eyebrow">Sua seita</div><h1>${esc(V.sect)} por dentro</h1><p class="lede">${M.length} membros conhecidos. O panorama da cidade inteira fica com o narrador.</p></div>
+      <section class="stack" style="gap:10px"><h2>Clãs</h2>${bars(cl)}</section>
+      ${o ? `<section class="stack" style="gap:10px"><h2>Hierarquia</h2>${hierarchy(o)}</section>` : ''}</div>`;
+  }
+  const sects = [...new Set(D.chars.map(c => c.sect).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'pt'));
+  const clans = uniq('clan');
+  const m = {}; let max = 1;
+  D.chars.forEach(c => { if (!c.sect || !c.clan) return; const k = c.sect + '|' + c.clan; m[k] = (m[k] || 0) + 1; max = Math.max(max, m[k]); });
+  const cats = {}; [...D.chars].filter(c => c.cat).sort((a, b) => a.cat.localeCompare(b.cat)).forEach(c => { cats[catShort(c.cat)] = (cats[catShort(c.cat)] || 0) + 1; });
+  const cell = n => n ? `<td class="c" style="background:color-mix(in srgb, var(--blood) ${Math.round(12 + 70 * n / max)}%, transparent)">${n}</td>` : '<td class="c" style="color:var(--dot-off)">·</td>';
+  return `<div class="stack"><div><div class="eyebrow">Distribuição</div><h1>Panorama da cidade</h1><p class="lede">Contagem a partir da planilha, incluindo personagens de jogador.</p></div>
+    <section class="stack" style="gap:10px"><h2>Seita × clã</h2><div class="tbl"><table class="data heat"><thead><tr><th>Seita</th>${clans.map(c => `<th class="v">${esc(c)}</th>`).join('')}<th class="n">Total</th></tr></thead><tbody>
+    ${sects.map(s => `<tr><td>${orgBySheet[s] ? `<a href="#s-${orgBySheet[s].id}">${esc(s)}</a>` : esc(s)}</td>${clans.map(c => cell(m[s + '|' + c])).join('')}<td class="n">${D.chars.filter(c => c.sect === s).length}</td></tr>`).join('')}
+    <tr><td><b>Total</b></td>${clans.map(c => `<td class="c"><b>${D.chars.filter(x => x.clan === c && x.sect).length}</b></td>`).join('')}<td class="n"><b>${D.chars.filter(c => c.sect).length}</b></td></tr></tbody></table></div></section>
+    <section class="stack" style="gap:10px"><h2>Categoria de idade</h2><p class="count">Da mais jovem para a mais antiga.</p>${bars(cats, true)}</section>
+    ${panoGeracao()}${panoSenhores()}${panoPendentes()}${panoLore()}</div>`;
+}
+function panoGeracao() {
+  const L = D.chars.filter(c => c.gen && c.cat && !c.morte);
+  const P = GM ? PEND : [];
+  const gens = [...new Set([...L.map(c => +c.gen), ...P.map(p => +p.gen)])].sort((a, b) => a - b);
+  const cats = [...new Set([...L, ...P].map(c => c.cat))].sort();
+  const cnt = (g, cat) => L.filter(c => +c.gen === g && c.cat === cat).length;
+  const pc = (g, cat) => P.filter(p => +p.gen === g && p.cat === cat).length;
+  const max = Math.max(1, ...gens.flatMap(g => cats.map(k => cnt(g, k) + pc(g, k))));
+  const cell = (g, k) => { const n = cnt(g, k), q = pc(g, k), t = n + q; return t ? `<td class="c" style="background:color-mix(in srgb, var(--blood) ${Math.round(12 + 70 * t / max)}%, transparent)">${n}${q ? `<sup class="count">+${q}</sup>` : ''}</td>` : '<td class="c" style="color:var(--dot-off)">·</td>'; };
+  return `<section class="stack" style="gap:10px" id="geracao"><h2>Geração</h2>
+    <p class="count">Personagens existentes por geração e categoria${P.length ? '; o número pequeno (+n) são as vagas ainda por criar' : ''}.</p>
+    <div class="tbl"><table class="data heat"><thead><tr><th>Geração</th>${cats.map(k => `<th class="v">${esc(catShort(k))}</th>`).join('')}<th class="n">Total</th></tr></thead><tbody>
+    ${gens.map(g => `<tr><td>${g}ª</td>${cats.map(k => cell(g, k)).join('')}<td class="n">${L.filter(c => +c.gen === g).length}${P.some(p => +p.gen === g) ? ` <span class="count">+${P.filter(p => +p.gen === g).length}</span>` : ''}</td></tr>`).join('')}
+    </tbody></table></div></section>`;
+}
+function panoSenhores() {
+  const st = D.senhores; if (!st) return '';
+  const pl = x => x.id ? `<a href="#p-${x.id}">${esc(x.n)}</a>` : `<span class="count">${esc(x.n)}</span>`;
+  const chip = x => x.id ? `<a class="chip" href="#p-${x.id}">${esc(x.n)}</a>` : `<span class="chip unk-c">${esc(x.n)}</span>`;
+  const pair = x => `<span class="chip">${pl(x)} <span class="count">←</span> ${x.s.map(pl).join(' <span class="count">ou</span> ')}</span>`;
+  const top = D.chars.filter(c => c.crias).sort((a, b) => b.crias.length - a.crias.length).slice(0, 8);
+  return `<section class="stack" style="gap:10px" id="senhores"><h2>Senhores e crias</h2>
+    <p class="count">Regra: senhor = uma geração acima, mais velho, mesmo clã e mesmo grupo de seita (Camarilla, Anarch, Sabá ou Independente). Caitiff aceita qualquer clã, preferindo a mesma seita e o mesmo arquétipo. Empate: quem tem menos crias, depois o mais velho. Os da lore, da ficha ou indicados pelo narrador vêm primeiro. Inclui as vagas ainda por criar (${st.pend}), pelo clã, idade, geração, seita e arquétipo planejados.</p>
+    ${bars({'Com senhor na cidade': st.com, 'Sem senhor na cidade': st.sem, 'Sem senhor, mas com possível senhor diablerista (2+ gerações acima)': st.diab, 'Sem senhor, mas com candidato em outra seita': st.cruz}, true)}
+    <p class="count">${st.conhecidos} vêm da lore, da ficha ou do narrador; o resto é automático e pode ser trocado na coluna “Senhor” da Lista.</p>
+    ${st.diableristas.length ? `<h3>Diableristas conhecidos</h3><div class="row">${st.diableristas.map(x => `<span class="chip">${pl(x)} <span class="count">era ${x.antes}ª · crias da geração antiga</span></span>`).join('')}</div>` : ''}
+    <h3>Possível senhor diablerista · ${st.diabL.length}</h3><p class="count">Sem senhor uma geração acima, mas há alguém do mesmo clã e grupo duas ou mais gerações acima: pode ter Abraçado e diablerizado depois.</p>
+    <div class="row">${st.diabL.map(pair).join('')}</div>
+    <h3>Senhor possível só em seita cruzada · ${st.cruzL.length}</h3><p class="count">Teria um senhor uma geração acima, mais velho e do mesmo clã, mas em outro grupo de seita: deserção, troca de lado ou Abraço por conveniência.</p>
+    <div class="row">${st.cruzL.map(pair).join('')}</div>
+    <h3>Mais crias</h3><div class="row">${top.map(c => `<a class="chip" href="#p-${c.id}">${esc(c.name)} <span class="count">${c.crias.length} cria${c.crias.length > 1 ? 's' : ''}</span></a>`).join('')}</div>
+    <h3>Sem senhor na cidade · ${st.semL.length}</h3><div class="row">${st.semL.map(chip).join('')}</div></section>`;
+}
+function panoPendentes() {
+  if (!PEND.length) return '';
+  const bySect = {}; PEND.forEach(p => (bySect[p.sect] = bySect[p.sect] || []).push(p));
+  const order = Object.keys(bySect).sort((a, b) => bySect[b].length - bySect[a].length || a.localeCompare(b, 'pt'));
+  return `<section class="stack" style="gap:10px" id="faltam"><h2>Ainda faltam criar · ${PEND.length}</h2>
+    <p class="count">Vagas da planilha (linhas “Novo NN”) ainda sem nome, lore ou imagem. Aparecem como “Desconhecido” na hierarquia de cada seita.</p>
+    <div class="tbl"><table class="data"><thead><tr><th>Seita</th><th>Vaga</th><th>Clã</th><th>Categoria</th><th class="n">Idade</th><th class="n">Ger.</th><th>Arquétipo</th></tr></thead><tbody>
+    ${order.map(s => bySect[s].sort((a, b) => a.cat.localeCompare(b.cat) || a.clan.localeCompare(b.clan, 'pt')).map((p, i) => `<tr>${i ? '<td></td>' : `<td rowspan="1"><b>${orgBySheet[s] ? `<a href="#s-${orgBySheet[s].id}">${esc(s)}</a>` : esc(s)}</b> <span class="count">${bySect[s].length}</span></td>`}<td>${esc(p.id)}</td><td>${esc(p.clan)}</td><td>${esc(catShort(p.cat))}</td><td class="n">${p.age}</td><td class="n">${p.gen}ª</td><td>${esc(p.arch)}</td></tr>`).join('')).join('')}
+    </tbody></table></div></section>`;
+}
+function panoLore() {
+  const L = D.chars.filter(c => !c.pc && c.lore_n != null && !c.especie && !c.morte);
+  const sem = L.filter(c => c.lore_n < 100).sort((a, b) => (a.sect || '').localeCompare(b.sect || '', 'pt') || a.name.localeCompare(b.name, 'pt'));
+  const curta = L.filter(c => c.lore_n >= 100 && c.lore_n < 250).sort((a, b) => a.lore_n - b.lore_n);
+  const semfoto = L.filter(c => c.lore_n >= 100 && !c.img).sort((a, b) => (a.sect || '').localeCompare(b.sect || '', 'pt') || a.name.localeCompare(b.name, 'pt'));
+  const chip = c => `<a class="chip" href="#p-${c.id}">${esc(c.name)} <span class="count">${esc(c.sect)} · ${esc(c.clan)}</span></a>`;
+  return `<section class="stack" style="gap:10px" id="semlore"><h2>Sem lore · ${sem.length}</h2>
+    <p class="count">Nenhum texto na planilha, no Kanka nem no Obsidian (menos de uma frase). As vantagens deles foram montadas por arquétipo, clã e seita.</p>
+    <div class="row">${sem.map(chip).join('') || '<span class="count">Todos têm alguma lore.</span>'}</div>
+    <h3 style="margin-top:8px">Com lore, sem foto · ${semfoto.length}</h3>
+    <p class="count">Já têm história, mas ainda falta retrato.</p>
+    <div class="row">${semfoto.map(chip).join('') || '<span class="count">Todos com lore já têm imagem.</span>'}</div>
+    <h3 style="margin-top:8px">Lore curta · ${curta.length}</h3>
+    <p class="count">Só uma ou duas frases: vale aprofundar.</p>
+    <div class="row">${curta.map(chip).join('')}</div></section>`;
+}
+function vDiverg() {
+  return `<div class="stack"><div><div class="eyebrow">Conferência</div><h1>Kanka × Planilha</h1><p class="lede">Onde os dois não batem. O site usa sempre o valor da planilha; esta lista serve para corrigir o Kanka.</p></div>
+    <div class="tbl"><table class="data"><thead><tr><th>Personagem</th><th>Campo</th><th>No Kanka</th><th>Na planilha (vale)</th></tr></thead><tbody>
+    ${D.diverg.map(d => { const c = D.chars.find(x => x.name === d.char); return `<tr class="link" data-go="p-${c ? c.id : ''}" tabindex="0"><td>${esc(d.char)}</td><td>${esc(d.field)}</td><td>${esc(d.kanka)}</td><td>${esc(d.sheet)}</td></tr>`; }).join('')}</tbody></table></div></div>`;
+}
+
+/* ---------- extras: território, mapa, painel de investigação, relações ---------- */
+const AFTER = [];
+const SC = (D.map && D.map.colors) || {};
+const fmtN = n => Number(n || 0).toLocaleString('pt-BR');
+const svgEsc = esc;
+
+function mapSvg(opts = {}) {
+  const M = D.map; if (!M) return '';
+  const hl = opts.sect;
+  const regs = M.regions.map(r => {
+    const fill = r.sects.length > 1 ? `url(#pat-${slugJs(r.name)})` : (SC[r.sects[0]] || '#444');
+    const on = !hl || r.sects.includes(hl) || (hl && (D.territory || []).some(b => b.seita === hl && regionOf(b.regiao) === r.name));
+    return `<path class="reg" d="${r.d}" fill="${fill}" fill-opacity="${on ? .78 : .14}" data-reg="${esc(r.name)}"><title>${esc(r.name)} · ${esc(r.sects.join(' e '))}</title></path>`;
+  }).join('');
+  const pats = M.regions.filter(r => r.sects.length > 1).map(r => `<pattern id="pat-${slugJs(r.name)}" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="5" height="10" fill="${SC[r.sects[0]]}"/><rect x="5" width="5" height="10" fill="${SC[r.sects[1]]}"/></pattern>`).join('');
+  const labels = opts.labels === false ? '' : M.regions.map(r => `<g pointer-events="none"><text x="${r.cx}" y="${r.cy - 4}" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" letter-spacing="1.5" fill="#f3eef0" stroke="#0f0d12" stroke-width="3" paint-order="stroke">${esc(r.name.toUpperCase())}</text><text x="${r.cx}" y="${r.cy + 10}" text-anchor="middle" font-family="Spectral, serif" font-size="11" fill="#f3eef0" stroke="#0f0d12" stroke-width="3" paint-order="stroke">${esc(r.sects.join(' / '))}</text></g>`).join('');
+  const pins = M.pins.filter(p => !hl || p.sect === hl).map(p => `<g><circle cx="${p.x}" cy="${p.y}" r="6.5" fill="${SC[p.sect]}" stroke="#0f0d12" stroke-width="2"/><circle cx="${p.x}" cy="${p.y}" r="2" fill="#0f0d12"/>${opts.pinLabels === false ? '' : `<text x="${p.x + 9}" y="${p.y + 4}" font-family="Spectral, serif" font-size="10.5" fill="#f3eef0" stroke="#0f0d12" stroke-width="3" paint-order="stroke">${esc(p.label)}</text>`}<title>${esc(p.label)} · ${esc(p.sect)} (posição aproximada)</title></g>`).join('');
+  return `<svg viewBox="0 0 ${M.w} ${M.h}" role="img" aria-label="Mapa de Juiz de Fora por seita"><defs>${pats}</defs>${regs}${labels}${pins}</svg>`;
+}
+const slugJs = s => norm(s).replace(/[^a-z0-9]+/g, '-');
+const regionOf = r => /centro/i.test(r) ? 'Centro' : r;
+function legend(active) {
+  const sects = [...new Set((D.territory || []).map(b => b.seita))];
+  return `<div class="legend">${sects.map(s => `<a href="#mapa" data-sect="${esc(s)}" style="text-decoration:none;${active && active !== s ? 'opacity:.45' : ''}"><span><i style="background:${SC[s] || '#555'}"></i>${esc(s)}</span></a>`).join('')}</div>`;
+}
+function bairroTable(list) {
+  const by = {}; list.forEach(b => (by[b.seita] = by[b.seita] || []).push(b));
+  return Object.entries(by).sort((a, b) => b[1].length - a[1].length).map(([s, L]) => {
+    const o = orgBySheet[s];
+    return `<section class="stack" style="gap:8px"><h3 style="display:flex;gap:10px;align-items:center"><i style="width:12px;height:12px;border-radius:3px;background:${SC[s]};display:inline-block"></i>${o ? `<a href="#s-${o.id}">${esc(s)}</a>` : esc(s)} <span class="count">${L.length} bairros · ${fmtN(L.reduce((a, b) => a + (b.pop || 0), 0))} habitantes</span></h3>
+      <div class="tbl"><table class="data"><thead><tr><th>Bairro</th><th>Região</th><th class="n">População</th></tr></thead><tbody>${L.sort((a, b) => (b.pop || 0) - (a.pop || 0)).map(b => `<tr><td>${esc(b.bairro)}</td><td>${esc(b.regiao)}</td><td class="n">${fmtN(b.pop)}</td></tr>`).join('')}</tbody></table></div></section>`;
+  }).join('');
+}
+let MAP_SECT = null;
+function vMapa() {
+  const T = D.territory || [];
+  const list = MAP_SECT ? T.filter(b => b.seita === MAP_SECT) : T;
+  AFTER.push(() => document.querySelectorAll('[data-sect]').forEach(a => a.addEventListener('click', e => { e.preventDefault(); MAP_SECT = MAP_SECT === a.dataset.sect ? null : a.dataset.sect; route(); })));
+  return `<div class="stack"><div><div class="eyebrow">Território</div><h1>Juiz de Fora à noite</h1>
+    <p class="lede">${T.length} bairros divididos entre ${new Set(T.map(b => b.seita)).size} seitas. Clique numa seita para destacar o território dela. Regiões traçadas a partir do mapa pintado; os pontos marcam enclaves dentro de regiões de outra seita (posição aproximada).</p></div>
+    ${legend(MAP_SECT)}
+    <div class="mapwrap">${mapSvg({ sect: MAP_SECT })}</div>
+    <h2>${MAP_SECT ? 'Bairros: ' + esc(MAP_SECT) : 'Bairros por seita'}</h2>${bairroTable(list)}</div>`;
+}
+function territorio(o, T) {
+  if (o.children && o.children.length) {
+    const kids = o.children.map(id => orgBy[id]);
+    const all = (D.territory || []).filter(b => kids.some(k => k.sheet_name === b.seita));
+    return `<div class="stack"><p class="lede">Os movimentos Anarchs controlam ${all.length} bairros e ${fmtN(all.reduce((a, b) => a + (b.pop || 0), 0))} habitantes.</p>
+      <div class="mapwrap">${mapSvg({ pinLabels: false })}</div>${bairroTable(all)}</div>`;
+  }
+  if (!T.length) return '<p class="lede">Sem bairros atribuídos na planilha de distribuição.</p>';
+  const regs = [...new Set(T.map(b => b.regiao))];
+  return `<div class="two"><div class="mapwrap">${mapSvg({ sect: o.sheet_name, labels: false })}</div>
+    <div class="stack" style="gap:12px"><dl class="facts"><div><dt>Bairros</dt><dd>${T.length}</dd></div><div><dt>População</dt><dd>${fmtN(T.reduce((a, b) => a + (b.pop || 0), 0))}</dd></div><div><dt>Regiões</dt><dd>${esc(regs.join(', '))}</dd></div></dl>
+    ${bairroTable(T)}</div></div>`;
+}
+
+/* ---------- layout de forças simples (sem bibliotecas) ---------- */
+function forceLayout(nodes, edges, W, H, fixedX) {
+  const N = nodes.length, idx = {}; nodes.forEach((n, i) => idx[n.id] = i);
+  let rnd = 7; const rand = () => (rnd = (rnd * 16807) % 2147483647) / 2147483647;
+  nodes.forEach(n => { n.x = n.fx ?? (W * .15 + rand() * W * .7); n.y = n.fy ?? (H * .2 + rand() * H * .6); n.vx = 0; n.vy = 0; });
+  const E = edges.map(e => [idx[e.a], idx[e.b], e.len || 80]);
+  for (let t = 0, alpha = 1; t < 420; t++, alpha *= .985) {
+    for (let i = 0; i < N; i++) for (let j = i + 1; j < N; j++) {
+      const a = nodes[i], b = nodes[j]; let dx = a.x - b.x, dy = a.y - b.y, d2 = dx * dx + dy * dy + .01;
+      if (d2 > 160000) continue; const f = 5200 / d2 * alpha, d = Math.sqrt(d2);
+      a.vx += dx / d * f; a.vy += dy / d * f; b.vx -= dx / d * f; b.vy -= dy / d * f;
+    }
+    E.forEach(([i, j, L]) => { const a = nodes[i], b = nodes[j]; const dx = b.x - a.x, dy = b.y - a.y, d = Math.sqrt(dx * dx + dy * dy) + .01, f = (d - L) * (L > 100 ? .008 : .03) * alpha; a.vx += dx / d * f; a.vy += dy / d * f; b.vx -= dx / d * f; b.vy -= dy / d * f; });
+    nodes.forEach(n => {
+      n.vx += (W / 2 - n.x) * .001 * alpha; n.vy += (H / 2 - n.y) * .002 * alpha;
+      if (n.tx != null) n.vx += (n.tx - n.x) * .08; if (n.ty != null) n.vy += (n.ty - n.y) * .06;
+      n.x += n.vx * .6; n.y += n.vy * .6; n.vx *= .55; n.vy *= .55;
+      n.x = Math.max(30, Math.min(W - 30, n.x)); n.y = Math.max(30, Math.min(H - 30, n.y));
+    });
+  }
+}
+
+/* ---------- painel de investigação ---------- */
+function boardGraph() {
+  const S = D.sessions;
+  const nodes = [], edges = [];
+  S.forEach((s, i) => nodes.push({ id: 'c-' + s.id, kind: 's', label: s.num ? 'S' + s.num.slice(1) : String(i + 1), name: cleanName(s.name), order: i, tx: 70 + i * (980 / Math.max(1, S.length - 1)), ty: 340 }));
+  const chars = D.chars.filter(c => (c.sessions || []).length || c.pc);
+  chars.forEach(c => {
+    const first = Math.min(...(c.sessions || []).map(id => sesBy[id] ? sesBy[id].n : 99), c.pc ? 0 : 99);
+    nodes.push({ id: 'p-' + c.id, kind: 'p', label: c.name, name: c.name, img: c.img, pc: c.pc, order: first === 99 ? 0 : first });
+    (c.sessions || []).forEach(sid => edges.push({ a: 'p-' + c.id, b: 'c-' + sid, kind: 'ps', order: sesBy[sid] ? sesBy[sid].n : 0, len: 55 }));
+  });
+  const sects = [...new Set(chars.map(c => c.sect).filter(s => orgBySheet[s]))];
+  sects.forEach((s, i) => {
+    const o = orgBySheet[s]; const mem = chars.filter(c => c.sect === s);
+    const ord = Math.min(...mem.map(c => nodes.find(n => n.id === 'p-' + c.id).order));
+    nodes.push({ id: 's-' + o.id, kind: 'o', label: o.name, name: o.name, img: o.emblem || o.img, order: ord, tx: 120 + i * (860 / Math.max(1, sects.length - 1)), ty: i % 2 ? 630 : 50 });
+    mem.forEach(c => edges.push({ a: 'p-' + c.id, b: 's-' + o.id, kind: 'po', order: nodes.find(n => n.id === 'p-' + c.id).order, len: 200 }));
+  });
+  (D.relations || []).forEach(r => {
+    const a = r.a.kind + '-' + r.a.id, b = r.b.kind + '-' + r.b.id;
+    if (nodes.find(n => n.id === a) && nodes.find(n => n.id === b)) edges.push({ a, b, kind: 'rel', label: r.tipo, order: 0, len: 90 });
+  });
+  return { nodes, edges };
+}
+let BOARD = null, BOARD_UPTO = null, BOARD_SECTS = true;
+function boardHtml() {
+  if (!BOARD) { BOARD = boardGraph(); forceLayout(BOARD.nodes, BOARD.edges, 1100, 680); }
+  const nS = D.sessions.length; if (BOARD_UPTO == null) BOARD_UPTO = nS;
+  AFTER.push(drawBoard);
+  return `<section class="stack" style="gap:10px"><h2>Painel de investigação</h2>
+    <p class="lede">Quem apareceu em qual sessão e a que seita pertence. Fios vermelhos ligam personagens às sessões; fios dourados, às seitas. Clique num ponto para ver as conexões e arraste para reorganizar.</p>
+    <div class="board"><div class="tools">
+      <label for="b-upto">Até a sessão <b id="b-upto-v" class="xp">${BOARD_UPTO}</b><input id="b-upto" type="range" min="1" max="${nS}" value="${BOARD_UPTO}"></label>
+      <label for="b-sect"><input id="b-sect" type="checkbox" ${BOARD_SECTS ? 'checked' : ''}> Mostrar seitas</label>
+      <span class="count" id="b-count"></span></div>
+      <svg id="bsvg" viewBox="0 0 1100 680" aria-label="Painel de investigação da crônica"></svg>
+      <div class="info" id="binfo" hidden></div></div></section>`;
+}
+function drawBoard(bindTools = true) {
+  const svg = $('#bsvg'); if (!svg) return;
+  const { nodes, edges } = BOARD, byN = {}; nodes.forEach(n => byN[n.id] = n);
+  const visN = n => n.order < BOARD_UPTO && (BOARD_SECTS || n.kind !== 'o');
+  const visE = e => byN[e.a] && byN[e.b] && visN(byN[e.a]) && visN(byN[e.b]) && e.order < BOARD_UPTO;
+  const defs = `<defs><clipPath id="cp"><circle r="17"/></clipPath><clipPath id="cpb"><circle r="22"/></clipPath><filter id="sh"><feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#000" flood-opacity=".6"/></filter></defs>`;
+  const E = edges.filter(visE).map((e, i) => { const a = byN[e.a], b = byN[e.b];
+    const st = e.kind === 'ps' ? 'stroke="#c42a3a" stroke-opacity=".55" stroke-width="1.3"' : e.kind === 'po' ? 'stroke="#d9a441" stroke-opacity=".45" stroke-width="1" stroke-dasharray="4 4"' : 'stroke="#9d93e6" stroke-opacity=".8" stroke-width="1.6"';
+    return `<line data-e="${i}" data-a="${e.a}" data-b="${e.b}" x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" ${st}/>`; }).join('');
+  const Nd = nodes.filter(visN).map(n => {
+    if (n.kind === 's') return `<g class="bn" data-id="${n.id}" transform="translate(${n.x},${n.y})" filter="url(#sh)"><rect x="-24" y="-15" width="48" height="30" rx="3" fill="#e9e1d0"/><circle cx="0" cy="-15" r="3.5" fill="#c42a3a"/><text y="5" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="12" fill="#1b1720">${esc(n.label)}</text><title>${esc(n.name)}</title></g>`;
+    if (n.kind === 'o') return `<g class="bn" data-id="${n.id}" transform="translate(${n.x},${n.y})" filter="url(#sh)"><rect x="-19" y="-19" width="38" height="38" rx="6" fill="#fff"/>${n.img ? `<image href="${n.img}" x="-17" y="-17" width="34" height="34" preserveAspectRatio="xMidYMid meet"/>` : ''}<text y="34" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" letter-spacing="1" fill="#d9a441">${esc(n.label.toUpperCase())}</text><title>${esc(n.name)}</title></g>`;
+    const r = n.pc ? 22 : 17;
+    return `<g class="bn" data-id="${n.id}" transform="translate(${n.x},${n.y})"><circle r="${r + 2}" fill="${n.pc ? '#d9a441' : '#3a3342'}"/>${n.img ? `<image href="${n.img}" x="${-r}" y="${-r}" width="${2 * r}" height="${2 * r * 1.25}" clip-path="url(#${n.pc ? 'cpb' : 'cp'})" preserveAspectRatio="xMidYMin slice"/>` : `<circle r="${r}" fill="#1f1b26"/><text y="5" text-anchor="middle" font-family="Bodoni Moda, serif" font-size="14" fill="#9d93a1">${esc(n.label[0])}</text>`}<text y="${r + 13}" text-anchor="middle" font-family="Spectral, serif" font-size="11" fill="#ebe5e8" stroke="#141118" stroke-width="3" paint-order="stroke">${esc(n.label.length > 18 ? n.label.split(' ')[0] : n.label)}</text><title>${esc(n.name)}</title></g>`;
+  }).join('');
+  svg.innerHTML = defs + `<g id="be">${E}</g><g id="bnodes">${Nd}</g>`;
+  $('#b-count').textContent = `${nodes.filter(visN).filter(n => n.kind === 'p').length} personagens · ${edges.filter(visE).length} ligações`;
+  const info = $('#binfo');
+  const pt = ev => { const r = svg.getBoundingClientRect(); return [(ev.clientX - r.left) / r.width * 1100, (ev.clientY - r.top) / r.height * 680]; };
+  let drag = null, moved = false;
+  const focus = id => {
+    const nb = new Set([id]); edges.filter(visE).forEach(e => { if (e.a === id) nb.add(e.b); if (e.b === id) nb.add(e.a); });
+    svg.querySelectorAll('.bn').forEach(g => g.style.opacity = nb.has(g.dataset.id) ? 1 : .15);
+    svg.querySelectorAll('line').forEach(l => l.style.opacity = (l.dataset.a === id || l.dataset.b === id) ? 1 : .06);
+    const n = byN[id]; const rel = [...nb].filter(x => x !== id).map(x => byN[x]);
+    info.innerHTML = `<div class="eyebrow">${n.kind === 's' ? 'Sessão' : n.kind === 'o' ? 'Seita' : 'Personagem'}</div><div style="font-family:var(--display);font-size:20px;margin:2px 0 6px">${esc(n.name)}</div>
+      <div class="count" style="margin-bottom:8px">${rel.length} conexões</div><div class="row" style="gap:6px">${rel.slice(0, 18).map(r => `<a class="chip" href="#${r.id}">${esc(r.kind === 's' ? r.label : r.name)}</a>`).join('')}</div>
+      <p style="margin:10px 0 0"><a href="#${id}">Abrir página →</a></p>`;
+    info.hidden = false;
+  };
+  const reset = () => { svg.querySelectorAll('.bn,line').forEach(x => x.style.opacity = ''); info.hidden = true; };
+  svg.addEventListener('pointerdown', ev => { const g = ev.target.closest('.bn'); if (!g) { reset(); return; } drag = byN[g.dataset.id]; moved = false; svg.setPointerCapture(ev.pointerId); });
+  svg.addEventListener('pointermove', ev => { if (!drag) return; const [x, y] = pt(ev); drag.x = x; drag.y = y; moved = true;
+    const g = svg.querySelector(`.bn[data-id="${drag.id}"]`); g.setAttribute('transform', `translate(${x},${y})`);
+    svg.querySelectorAll(`line[data-a="${drag.id}"]`).forEach(l => { l.setAttribute('x1', x); l.setAttribute('y1', y); });
+    svg.querySelectorAll(`line[data-b="${drag.id}"]`).forEach(l => { l.setAttribute('x2', x); l.setAttribute('y2', y); }); });
+  svg.addEventListener('pointerup', () => { if (drag && !moved) focus(drag.id); drag = null; });
+  if (!bindTools) return;
+  const up = $('#b-upto'); up.addEventListener('input', () => { BOARD_UPTO = +up.value; $('#b-upto-v').textContent = up.value; drawBoardInner(); });
+  $('#b-sect').addEventListener('change', e => { BOARD_SECTS = e.target.checked; drawBoardInner(); });
+}
+function drawBoardInner() { const old = $('#bsvg'); const fresh = old.cloneNode(false); old.replaceWith(fresh); drawBoard(false); }
+
+/* ---------- mapa de relações do personagem ---------- */
+function relsOf(c) { return (D.relations || []).filter(r => (r.a.kind === 'p' && r.a.id === c.id) || (r.b.kind === 'p' && r.b.id === c.id)); }
+function egoMap(c, R) {
+  const W = 900, H = 720, cx = W / 2, cy = H / 2;
+  const typed = R.map(r => { const o = r.a.kind === 'p' && r.a.id === c.id ? r.b : r.a; return { ...o, tipo: r.tipo, nota: r.nota }; });
+  const seen = new Set(typed.map(t => t.kind + t.id));
+  const co = D.chars.filter(x => x.id !== c.id && !seen.has('p' + x.id)).map(x => ({ x, n: (x.sessions || []).filter(s => (c.sessions || []).includes(s)).length })).filter(o => o.n).sort((a, b) => b.n - a.n)
+    .slice(0, 10);
+  const node = (o, x, y, r) => {
+    const ch = o.kind === 'p' && byId['p-' + o.id], org = o.kind === 's' && orgBy[o.id];
+    const href = ch ? `#p-${o.id}` : org ? `#s-${o.id}` : null;
+    const pic = ch && ch.img ? `<image href="${ch.img}" x="${-r}" y="${-r}" width="${2 * r}" height="${2.5 * r}" clip-path="url(#eg${r})" preserveAspectRatio="xMidYMin slice"/>`
+      : org && (org.emblem || org.img) ? `<rect x="${-r}" y="${-r}" width="${2 * r}" height="${2 * r}" rx="6" fill="${org.ebg || '#fff'}"/><image href="${org.emblem || org.img}" x="${-r + 4}" y="${-r + 4}" width="${2 * r - 8}" height="${2 * r - 8}" preserveAspectRatio="xMidYMid meet"/>`
+      : `<circle r="${r}" fill="#1f1b26" stroke="#3a3342"/><text y="5" text-anchor="middle" font-family="Bodoni Moda, serif" font-size="${r * .8}" fill="#9d93a1">${esc((o.name || '?')[0])}</text>`;
+    const g = `<g transform="translate(${x},${y})"><circle r="${r + 2}" fill="#3a3342"/>${pic}<text y="${r + 14}" text-anchor="middle" font-family="Spectral, serif" font-size="12" fill="#ebe5e8" stroke="#0f0d12" stroke-width="3" paint-order="stroke">${esc(o.name)}</text></g>`;
+    return href ? `<a href="${href}">${g}</a>` : g;
+  };
+  const ring = (arr, rx, ry, off = 0) => arr.map((o, i) => { const a = off + i / Math.max(1, arr.length) * Math.PI * 2 - Math.PI / 2; return [o, cx + Math.cos(a) * rx, cy + Math.sin(a) * ry]; });
+  const T = ring(typed, 250, 205), C = ring(co.map(o => ({ kind: 'p', id: o.x.id, name: o.x.name, n: o.n })), 405, 315, Math.PI / Math.max(1, co.length));
+  const lines = [...T.map(([o, x, y]) => `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="#9d93e6" stroke-width="1.6"/><text x="${cx + (x - cx) * .66}" y="${cy + (y - cy) * .66 - 4}" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#d9a441" stroke="#0f0d12" stroke-width="3" paint-order="stroke">${esc(o.tipo)}</text>`),
+    ...C.map(([o, x, y]) => `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="#c42a3a" stroke-opacity=".5" stroke-width="${Math.min(4, o.n)}"/>`)].join('');
+  const svg = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Mapa de relações de ${esc(c.name)}"><defs>${[17, 22, 30].map(r => `<clipPath id="eg${r}"><circle r="${r}"/></clipPath>`).join('')}</defs>${lines}
+    ${C.map(([o, x, y]) => node(o, x, y, 17)).join('')}${T.map(([o, x, y]) => node(o, x, y, 22)).join('')}${node({ kind: 'p', id: c.id, name: c.name }, cx, cy, 30)}</svg>`;
+  return `<div class="stack" style="gap:16px">
+    <div class="legend"><span><i style="background:#9d93e6"></i>Relação declarada (senhor, pilar, aliado…)</span><span><i style="background:#c42a3a"></i>Apareceram juntos nas sessões (mais grosso = mais vezes)</span></div>
+    <div class="board" style="background:#141118">${svg}</div>
+    ${typed.length ? `<div class="tbl"><table class="data"><thead><tr><th>Com</th><th>Relação</th><th>Nota</th></tr></thead><tbody>${typed.map(t => `<tr><td>${t.kind === 'p' ? `<a href="#p-${t.id}">${esc(t.name)}</a>` : t.kind === 's' ? `<a href="#s-${t.id}">${esc(t.name)}</a>` : esc(t.name)}</td><td>${esc(t.tipo)}</td><td>${esc(t.nota || '')}</td></tr>`).join('')}</tbody></table></div>` : '<p class="note">Ainda sem relações declaradas (senhor, pilar, aliados, inimigos). Elas entram pela lista de relações; por enquanto o mapa mostra só quem apareceu junto nas sessões.</p>'}
+  </div>`;
+}
+
+// ---------------- disco da Urutau: aba na nota da banda, anúncio no início e player que segue tocando entre as páginas
+const ALB = D.album || null;
+const fmtT = x => `${Math.floor(x / 60)}:${String(Math.floor(x % 60)).padStart(2, '0')}`;
+function albumPromo() {
+  if (!ALB) return '';
+  const note = D.notes.find(n => n.id === 'urutau-banda');
+  return `<section class="promo" aria-label="Lançamento">
+    <img src="${ALB.capa}" alt="Capa do disco ${esc(ALB.titulo)}">
+    <div class="stack" style="gap:10px">
+      <div class="eyebrow" style="color:var(--blood)">Lançamento · ${ALB.ano}</div>
+      <h2 style="font-size:clamp(26px,4vw,40px)">${esc(ALB.banda)} · <em>${esc(ALB.titulo)}</em></h2>
+      <p class="lede" style="margin:0">A banda mais conhecida entre os Membros da Nova Juiz de Fora lança seu primeiro disco depois do Abraço: ${ALB.faixas.length} faixas gravadas na cidade, de “${esc(ALB.faixas[0].t)}” a “${esc(ALB.faixas[ALB.faixas.length - 1].t)}”.</p>
+      <div class="row"><button type="button" class="btn" data-play="0">▶ Ouvir agora</button>${note ? `<a class="chip" href="#n-${note.id}">Ver o disco e a banda</a>` : ''}</div>
+      <p class="count" style="margin:0">O player continua tocando enquanto você navega pelo atlas.</p>
+    </div></section>`;
+}
+function albumHtml() {
+  const tot = ALB.faixas.reduce((a, f) => a + f.d, 0);
+  return `<div class="album">
+    <div class="covers"><button type="button" data-zoom="${ALB.capa}" class="cv"><img src="${ALB.capa}" alt="Capa"></button><button type="button" data-zoom="${ALB.contracapa}" class="cv"><img src="${ALB.contracapa}" alt="Contracapa"></button></div>
+    <div class="stack" style="gap:12px">
+      <div><div class="eyebrow">${esc(ALB.banda)} · ${ALB.ano} · ${ALB.faixas.length} faixas · ${fmtT(tot)}</div><h2>${esc(ALB.titulo)}</h2></div>
+      <div class="row"><button type="button" class="btn" data-play="0">▶ Tocar o disco</button></div>
+      <ol class="tracks">${ALB.faixas.map((f, i) => `<li><button type="button" data-play="${i}"><span class="n">${String(f.n).padStart(2, '0')}</span><span class="t">${esc(f.t)}</span><span class="d">${fmtT(f.d)}</span></button></li>`).join('')}</ol>
+      <dl class="kv">${ALB.creditos.map(([a, b]) => `<dt>${esc(b)}</dt><dd>${byName[a] ? `<a href="#p-${byName[a].id}">${esc(a)}</a>` : esc(a)}</dd>`).join('')}</dl>
+      <p class="count">${esc(ALB.nota)}</p>
+    </div></div>`;
+}
+function vBanda(nt) {
+  const tabs = [['disco', `Disco · ${ALB.titulo}`], ['banda', 'A banda']];
+  return `<div class="stack">${nt.img ? `<img class="banner" src="${nt.img}" alt="">` : ''}
+    <div><div class="eyebrow">Nota · Banda</div><h1>Urutau</h1><p class="lede">${esc(ALB.titulo)}, o novo disco, já está tocando na cidade.</p></div>
+    <div class="tabs" role="tablist">${tabs.map(([id, l], i) => `<button role="tab" data-tab="${id}" class="${i ? '' : 'on'}">${esc(l)}</button>`).join('')}</div>
+    <section data-panel="disco">${albumHtml()}</section>
+    <section data-panel="banda" hidden><div class="prose">${nt.html || ''}</div></section></div>`;
+}
+const byName = {}; D.chars.forEach(c => byName[c.name] = c);
+const PL = { i: -1, a: null };
+function playerBar() {
+  let bar = document.getElementById('player');
+  if (bar) return bar;
+  bar = document.createElement('div'); bar.id = 'player'; bar.hidden = true;
+  bar.innerHTML = `<img alt="" class="pc"><div class="pi"><div class="pt"></div><div class="pa">${ALB ? esc(ALB.banda) + ' · ' + esc(ALB.titulo) : ''}</div></div>
+    <div class="pb"><button type="button" data-pl="prev" aria-label="Faixa anterior">⏮</button><button type="button" data-pl="toggle" aria-label="Tocar ou pausar">⏸</button><button type="button" data-pl="next" aria-label="Próxima faixa">⏭</button></div>
+    <input type="range" min="0" max="1000" value="0" aria-label="Posição na faixa"><span class="tm">0:00</span>
+    <button type="button" data-pl="close" aria-label="Fechar o player">✕</button>`;
+  document.body.appendChild(bar);
+  const a = PL.a = new Audio(); a.preload = 'auto';
+  const rng = bar.querySelector('input'), tm = bar.querySelector('.tm'), tg = bar.querySelector('[data-pl=toggle]');
+  a.addEventListener('timeupdate', () => { if (a.duration) { rng.value = Math.round(a.currentTime / a.duration * 1000); tm.textContent = `${fmtT(a.currentTime)} / ${fmtT(a.duration)}`; } });
+  a.addEventListener('play', () => { tg.textContent = '⏸'; markPlaying(); });
+  a.addEventListener('pause', () => { tg.textContent = '▶'; markPlaying(); });
+  a.addEventListener('ended', () => PL.i < ALB.faixas.length - 1 ? playTrack(PL.i + 1) : (tg.textContent = '▶'));
+  rng.addEventListener('input', () => { if (a.duration) a.currentTime = rng.value / 1000 * a.duration; });
+  bar.addEventListener('click', e => {
+    const k = e.target.closest('[data-pl]'); if (!k) return;
+    const c = k.dataset.pl;
+    if (c === 'toggle') a.paused ? a.play() : a.pause();
+    if (c === 'prev') playTrack(Math.max(0, a.currentTime > 3 ? PL.i : PL.i - 1));
+    if (c === 'next' && PL.i < ALB.faixas.length - 1) playTrack(PL.i + 1);
+    if (c === 'close') { a.pause(); bar.hidden = true; document.body.classList.remove('playing'); }
+  });
+  return bar;
+}
+async function playTrack(i) {
+  if (!ALB) return;
+  const bar = playerBar(); const f = ALB.faixas[i]; PL.i = i;
+  bar.hidden = false; document.body.classList.add('playing');
+  bar.querySelector('.pt').textContent = `${String(f.n).padStart(2, '0')} · ${f.t}`;
+  const cv = bar.querySelector('.pc'); cv.src = ALB.capa; if (window.__mediaSrc) window.__mediaSrc(cv);
+  PL.a.src = window.__audioSrc ? await window.__audioSrc(f.f) : f.f;
+  try { await PL.a.play(); } catch (e) {}
+  markPlaying();
+}
+function markPlaying() {
+  document.querySelectorAll('[data-play]').forEach(b => b.classList.toggle('on', PL.a && !PL.a.paused && +b.dataset.play === PL.i && b.closest('.tracks')));
+}
+document.addEventListener('click', e => { const b = e.target.closest('[data-play]'); if (b) { e.preventDefault(); playTrack(+b.dataset.play); } });
+addEventListener('hashchange', () => setTimeout(markPlaying, 0));
+/* ---------- roteamento ---------- */
+function route() {
+  AFTER.length = 0;
+  const h = decodeURIComponent(location.hash.slice(1)) || 'inicio';
+  let html, key = h;
+  if (h.startsWith('p-') && byId[h]) { html = vPersonagem(byId[h]); key = 'personagens'; }
+  else if (h.startsWith('s-') && orgBy[h.slice(2)]) { html = vSeita(orgBy[h.slice(2)]); key = 'seitas'; }
+  else if (h.startsWith('c-') && sesBy[h.slice(2)]) { html = vSessao(sesBy[h.slice(2)]); key = 'cronica'; }
+  else if (h.startsWith('l-') && D.places.find(p => p.id === h.slice(2))) { html = vTexto(D.places.find(p => p.id === h.slice(2)), 'Lugar'); key = 'lugares'; }
+  else if (h.startsWith('n-') && D.notes.find(p => p.id === h.slice(2))) { const nt = D.notes.find(p => p.id === h.slice(2)); html = D.album && nt.id === 'urutau-banda' ? vBanda(nt) : vTexto(nt, 'Nota'); key = 'lugares'; }
+  else html = ({ inicio: vInicio, personagens: vPersonagens, seitas: vSeitas, cronica: vCronica, calendario: vCalendario, mapa: vMapa, lugares: vLugares, panorama: vPanorama, divergencias: GM ? vDiverg : vInicio, painel: P && P.owner ? vPainel : vInicio, visibilidade: window.__ATLAS && GM ? window.__ATLAS.vVis : vInicio }[h] || vInicio)();
+  const main = $('#main'); main.innerHTML = html; resolveRefs(main); AFTER.forEach(f => f());
+  document.querySelectorAll('#nav a').forEach(a => a.classList.toggle('on', a.dataset.k === key));
+  if (h === 'personagens') {
+    drawCards();
+    ['q', 'sect', 'clan', 'cat', 'tipo', 'ord'].forEach(k => { const el = $('#f-' + k); if (el) el.addEventListener('input', () => { F[k] = el.value; store.set('filtros', F); drawCards(); }); });
+  }
+  main.querySelectorAll('[role=tab]').forEach(b => b.addEventListener('click', () => {
+    main.querySelectorAll('[role=tab]').forEach(x => x.classList.toggle('on', x === b));
+    main.querySelectorAll('[data-panel]').forEach(p => p.hidden = p.dataset.panel !== b.dataset.tab);
+  }));
+  main.querySelectorAll('[data-go]').forEach(tr => { const go = () => tr.dataset.go && (location.hash = tr.dataset.go); tr.addEventListener('click', go); tr.addEventListener('keydown', e => e.key === 'Enter' && go()); });
+  window.scrollTo(0, 0);
+}
+addEventListener('hashchange', route);
+document.addEventListener('click', e => {
+  const z = e.target.closest('[data-zoom]');
+  if (z) { const lb = document.createElement('div'); lb.className = 'lb'; lb.innerHTML = `<img src="${z.dataset.zoom}" alt="">`; lb.addEventListener('click', () => lb.remove()); document.body.appendChild(lb); return; }
+});
+addEventListener('keydown', e => { if (e.key === 'Escape') document.querySelectorAll('.lb').forEach(x => x.remove()); });
+
+/* ---------- busca ---------- */
+const IDX = [...D.chars.map(c => ['p-' + c.id, c.name, [c.clan, c.sect, c.role].join(' '), c.clan || 'Personagem']),
+  ...D.orgs.map(o => ['s-' + o.id, o.name, o.sheet_name, 'Seita']), ...D.sessions.map(s => ['c-' + s.id, cleanName(s.name), '', 'Sessão']),
+  ...D.places.map(p => ['l-' + p.id, p.name, '', 'Lugar']), ...D.notes.map(n => ['n-' + n.id, n.name, '', 'Nota'])].map(x => [...x, norm(x[1] + ' ' + x[2])]);
+$('#q').addEventListener('input', e => {
+  const q = norm(e.target.value);
+  $('#sres').innerHTML = q.length < 2 ? '' : IDX.filter(x => x[4].includes(q)).slice(0, 8).map(x => `<a href="#${x[0]}">${esc(x[1])}<em>${esc(x[3])}</em></a>`).join('') || '<span class="count">Nada encontrado</span>';
+});
+$('#sres').addEventListener('click', () => { $('#q').value = ''; $('#sres').innerHTML = ''; });
+
+route();
+</script>
+<script>// Atlas · Juiz de Fora by Night — login por perfil, dados e imagens criptografados (AES-GCM, chave derivada da senha)
+(function () {
+  const enc = new TextEncoder();
+  const b64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+  const tob64 = buf => btoa(String.fromCharCode(...new Uint8Array(buf)));
+  const hex = buf => [...new Uint8Array(buf)].map(x => x.toString(16).padStart(2, '0')).join('');
+  const CFG = JSON.parse(document.getElementById('atlas-cfg').textContent);
+  const PH = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7#';
+  const box = document.getElementById('login'), form = document.getElementById('lf'), msg = document.getElementById('lmsg');
+
+  async function fileFor(user) {
+    return hex(await crypto.subtle.digest('SHA-256', enc.encode(CFG.salt + ':' + user.toLowerCase().trim()))).slice(0, 24);
+  }
+  async function gunzip(buf) {
+    const ds = new DecompressionStream('gzip');
+    return await new Response(new Blob([buf]).stream().pipeThrough(ds)).text();
+  }
+  async function openWithKey(file, key) {
+    const r = await fetch(`dados/${file}.bin`, { cache: 'no-store' });
+    if (!r.ok) throw new Error('perfil');
+    const p = await r.json();
+    const plain = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: b64(p.iv) }, key, b64(p.ct));
+    return JSON.parse(await gunzip(plain));
+  }
+  async function login(user, pass) {
+    const file = await fileFor(user);
+    const r = await fetch(`dados/${file}.bin`, { cache: 'no-store' });
+    if (!r.ok) throw new Error('perfil');
+    const p = await r.json();
+    const base = await crypto.subtle.importKey('raw', enc.encode(pass), 'PBKDF2', false, ['deriveKey']);
+    const key = await crypto.subtle.deriveKey({ name: 'PBKDF2', salt: b64(p.salt), iterations: p.iter, hash: 'SHA-256' },
+      base, { name: 'AES-GCM', length: 256 }, true, ['decrypt']);
+    const plain = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: b64(p.iv) }, key, b64(p.ct));
+    try { sessionStorage.setItem('atlas', JSON.stringify({ f: file, k: tob64(await crypto.subtle.exportKey('raw', key)) })); } catch (e) {}
+    return JSON.parse(await gunzip(plain));
+  }
+
+  // ---------- imagens: o app recebe um marcador; aqui a imagem é baixada, decifrada e trocada por um blob
+  let IMG = {};
+  const cache = new Map();
+  function imgUrl(path) {
+    if (!cache.has(path)) cache.set(path, (async () => {
+      const m = IMG[path]; if (!m) return '';
+      const [file, k] = m;
+      const buf = await (await fetch(`midia/${file}.bin`)).arrayBuffer();
+      const key = await crypto.subtle.importKey('raw', b64(k), 'AES-GCM', false, ['decrypt']);
+      const plain = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: new Uint8Array(buf, 0, 12) }, key, new Uint8Array(buf, 12));
+      return URL.createObjectURL(new Blob([plain], { type: 'image/jpeg' }));
+    })());
+    return cache.get(path);
+  }
+  function fix(img) {
+    const s = img.getAttribute('src') || '';
+    if (s.startsWith(PH)) { const path = s.slice(PH.length); img.dataset.enc = path; imgUrl(path).then(u => { if (img.dataset.enc === path && u) img.src = u; }); }
+  }
+  new MutationObserver(ms => ms.forEach(m => {
+    if (m.type === 'attributes') fix(m.target);
+    m.addedNodes.forEach(n => { if (n.nodeType !== 1) return; if (n.tagName === 'IMG') fix(n); n.querySelectorAll && n.querySelectorAll('img').forEach(fix); });
+  })).observe(document.documentElement, { subtree: true, childList: true, attributes: true, attributeFilter: ['src'] });
+
+  // ---------- visibilidade (só o narrador): marca por personagem e por jogador, exporta visibilidade.json
+  function atlasGM(X) {
+    const LS = 'atlas-vis';
+    const load = () => { try { return JSON.parse(localStorage.getItem(LS)) || null; } catch (e) { return null; } };
+    let OV = load() || JSON.parse(JSON.stringify(X.visOverride || {}));
+    const DEF = {}; Object.entries(X.visDefault || {}).forEach(([pc, ids]) => DEF[pc] = new Set(ids));
+    const PCS = X.pcs || [];
+    const eff = (pc, id) => (OV[pc] && id in OV[pc]) ? OV[pc][id] : DEF[pc].has(id);
+    const changed = () => JSON.stringify(OV) !== JSON.stringify(X.visOverride || {});
+    const save = () => { try { localStorage.setItem(LS, JSON.stringify(OV)); } catch (e) {} };
+    function set(pc, id, v) {
+      OV[pc] = OV[pc] || {};
+      if (v === DEF[pc].has(id)) delete OV[pc][id]; else OV[pc][id] = v;
+      if (!Object.keys(OV[pc]).length) delete OV[pc];
+      save(); document.querySelectorAll('[data-vis-status]').forEach(el => el.innerHTML = status());
+    }
+    function status() {
+      const n = Object.values(OV).reduce((a, o) => a + Object.keys(o).length, 0);
+      return `${n} ajuste${n === 1 ? '' : 's'} manual${n === 1 ? '' : 's'}${changed() ? ' · <b style="color:var(--lamp)">alterações ainda não publicadas</b>' : ' · igual ao publicado'}`;
+    }
+    function download() {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([JSON.stringify(OV, null, 1)], { type: 'application/json' }));
+      a.download = 'visibilidade.json'; a.click();
+    }
+    document.addEventListener('change', e => {
+      const t = e.target.closest('[data-vis-pc]'); if (!t) return;
+      set(t.dataset.visPc, t.dataset.visC, t.checked);
+      const lab = t.closest('label'); if (lab) lab.classList.toggle('ov', OV[t.dataset.visPc] && t.dataset.visC in OV[t.dataset.visPc]);
+    });
+    document.addEventListener('click', e => {
+      if (e.target.closest('[data-vis-dl]')) download();
+      if (e.target.closest('[data-vis-reset]')) { OV = JSON.parse(JSON.stringify(X.visOverride || {})); save(); dispatchEvent(new HashChangeEvent('hashchange')); }
+    });
+    const box_ = (pc, c) => { const o = OV[pc.id] && c.id in OV[pc.id];
+      return `<label class="vischk${o ? ' ov' : ''}" title="${o ? 'ajuste manual' : 'padrão: ' + (DEF[pc.id].has(c.id) ? 'visível' : 'oculto')}"><input type="checkbox" data-vis-pc="${pc.id}" data-vis-c="${c.id}" ${eff(pc.id, c.id) ? 'checked' : ''}> ${pc.name.split(' ')[0].replace(/"/g, '')}</label>`; };
+    return {
+      visRow(c) {
+        return `<div class="visrow"><span class="eyebrow">Visível para</span>${PCS.map(pc => box_(pc, c)).join('')}<a class="count" href="#visibilidade">editar todos</a></div>`;
+      },
+      vVis() {
+        const chars = D.chars.filter(c => !c.pc).sort((a, b) => (a.sect || '').localeCompare(b.sect || '', 'pt') || a.name.localeCompare(b.name, 'pt'));
+        let lastSect = null;
+        return `<div class="stack"><div><div class="eyebrow">Narrador</div><h1>Visibilidade</h1>
+          <p class="lede">Quem cada jogador conhece. O padrão é: mesma seita, personagens de jogador e quem já apareceu numa sessão. Marque ou desmarque para ajustar personagem por personagem.</p></div>
+          <p class="note" style="max-width:none">As marcações ficam salvas neste navegador. Para valer no site: <b>1.</b> baixe o <code>visibilidade.json</code>; <b>2.</b> troque o arquivo em <code>fonte/</code>; <b>3.</b> rode <code>python montar.py</code>; <b>4.</b> suba a pasta <code>publicar/</code> para o GitHub.</p>
+          <div class="row"><button type="button" class="btn" data-vis-dl>Baixar visibilidade.json</button><button type="button" class="btn" data-vis-reset style="border-color:var(--line);background:none">Voltar ao publicado</button><span class="count" data-vis-status>${status()}</span></div>
+          <div class="tbl"><table class="data vis"><thead><tr><th>Personagem</th>${PCS.map(pc => `<th class="c">${pc.name.split(' ')[0].replace(/"/g, '')}<br><span class="count">${pc.sect}</span></th>`).join('')}</tr></thead><tbody>
+          ${chars.map(c => { const head = c.sect !== lastSect ? `<tr class="grp"><td colspan="${PCS.length + 1}">${c.sect || 'Sem seita'}</td></tr>` : ''; lastSect = c.sect;
+            return head + `<tr><td><a href="#p-${c.id}">${c.name}</a> <span class="count">${c.clan || ''}</span></td>${PCS.map(pc => `<td class="c">${box_(pc, c).replace(/> [^<]*<\/label>$/, '></label>')}</td>`).join('')}</tr>`; }).join('')}
+          </tbody></table></div></div>`;
+      },
+    };
+  }
+
+  async function start(data) {
+    IMG = data.img || {};
+    window.__D = data.D;
+    if (data.D.viewer.mode === 'gm') window.__ATLAS = atlasGM(data.extra || {});
+    else window.__ATLAS = null;
+    box.remove();
+    document.getElementById('shell').hidden = false;
+    const sc = document.createElement('script');
+    sc.textContent = document.getElementById('app').textContent;
+    document.body.appendChild(sc);
+    // sair
+    const g = document.querySelector('.side .gm');
+    if (g) { const b = document.createElement('button'); b.type = 'button'; b.className = 'btn'; b.style.marginTop = '10px'; b.textContent = 'Sair';
+      b.onclick = () => { try { sessionStorage.removeItem('atlas'); } catch (e) {} location.hash = ''; location.reload(); }; g.appendChild(b); }
+  }
+
+  form.addEventListener('submit', async e => {
+    e.preventDefault(); msg.textContent = 'Abrindo…';
+    try { await start(await login(form.u.value, form.p.value)); }
+    catch (err) { msg.textContent = 'Usuário ou senha não conferem.'; }
+  });
+  (async () => {
+    try {
+      const s = JSON.parse(sessionStorage.getItem('atlas') || 'null');
+      if (s) {
+        const key = await crypto.subtle.importKey('raw', b64(s.k), 'AES-GCM', false, ['decrypt']);
+        await start(await openWithKey(s.f, key)); return;
+      }
+    } catch (e) { try { sessionStorage.removeItem('atlas'); } catch (_) {} }
+    box.hidden = false; form.u.focus();
+  })();
+})();
+</script>
