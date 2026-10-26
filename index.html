@@ -114,10 +114,11 @@ a.chip:hover{border-color:var(--muted)}
 #player .pi{min-width:0;flex:0 1 220px}#player .pt{font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#player .pa{font-size:11.5px;color:var(--muted);font-family:var(--mono)}
 #player .pb{display:flex;gap:4px}
 #player button{all:unset;cursor:pointer;padding:6px 8px;border-radius:6px;color:var(--fg)}#player button:hover,#player button:focus-visible{background:var(--raised)}
-#player input{flex:1;min-width:60px;accent-color:var(--blood)}#player .tm{font-family:var(--mono);font-size:11.5px;color:var(--muted);white-space:nowrap}
+#player input{accent-color:var(--blood)}#player .pos{flex:1;min-width:60px}#player .vol{display:flex;align-items:center;gap:2px}#player .vr{width:90px}
+.tracks .plays{margin-left:10px;color:var(--lamp)}#player .tm{font-family:var(--mono);font-size:11.5px;color:var(--muted);white-space:nowrap}
 body.playing main{padding-bottom:84px}
 body.playing .side{padding-bottom:76px}
-@media (max-width:640px){#player .tm{display:none}#player .pi{flex-basis:120px}}
+@media (max-width:640px){#player .tm,#player .vr{display:none}#player .pi{flex-basis:120px}}
 .dots{display:inline-flex;gap:3px;flex:none}
 .dots i{width:10px;height:10px;border-radius:50%;border:1.5px solid var(--muted);display:block}
 .dots i.f{background:var(--fg);border-color:var(--fg)}
@@ -288,6 +289,12 @@ details.post .prose{padding:0 18px 16px}
 #login[hidden]{display:none}
 #lf{display:flex;flex-direction:column;gap:10px;width:min(360px,100%);padding:28px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
 #lf .brand{margin-bottom:12px}#lf .btn{margin-top:8px}
+#login{display:flex;flex-direction:column;align-items:center;justify-content:safe center;gap:22px;overflow:auto;padding:24px 16px 90px}
+#player{z-index:200}
+#login .keep{display:flex;gap:8px;align-items:center;font-size:14px;color:var(--muted)}
+#lalb{width:min(560px,100%);display:grid;grid-template-columns:150px 1fr;gap:16px;padding:16px;border:1px solid var(--line);border-left:3px solid var(--blood);border-radius:12px;background:var(--surface)}
+#lalb img{width:100%;border-radius:6px;display:block}#lalb .tracks button{font-size:14.5px;padding:6px 4px}
+@media (max-width:560px){#lalb{grid-template-columns:1fr}#lalb img{max-width:180px}}
 .visrow{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center}
 .vischk{display:inline-flex;gap:5px;align-items:center;font-size:13.5px;padding:3px 8px;border:1px solid var(--line);border-radius:999px;cursor:pointer}
 .vischk.ov{border-color:var(--lamp);background:var(--lamp-soft)}
@@ -297,8 +304,70 @@ table.vis td.c{text-align:center}table.vis .vischk{border:0;padding:2px}table.vi
   <label class="eyebrow" for="lu">Usuário</label><input id="lu" name="u" class="search" autocomplete="username" required>
   <label class="eyebrow" for="lp">Senha</label><input id="lp" name="p" type="password" class="search" autocomplete="current-password" required>
   <button class="btn" type="submit">Entrar</button><p id="lmsg" class="count" role="status"></p>
-  <p class="count">Cada perfil abre só o que aquele personagem conhece.</p></form></div>
-<script id="atlas-cfg" type="application/json">{"salt": "21ed15ca5bbbd007"}</script>
+  <label class="keep"><input type="checkbox" name="k" checked> Manter conectado neste computador por 30 dias</label>
+  <p class="count">Cada perfil abre só o que aquele personagem conhece.</p></form>
+  <section id="lalb" aria-label="Disco da Urutau"></section></div>
+<script id="atlas-cfg" type="application/json">{"salt": "21ed15ca5bbbd007", "album": {"id": "after-the-embrace", "banda": "Urutau", "titulo": "After the Embrace", "ano": 2026, "capa": "audio/capa.jpg", "contracapa": "audio/contracapa.jpg", "creditos": [["Hugo Castro", "guitarra e vocal"], ["Henri Castro", "baixo"], ["Raul Charles", "bateria"]], "nota": "Produzido pela Urutau · gravado em Juiz de Fora, MG · 2026", "faixas": [{"n": 1, "t": "After the Embrace", "f": "audio/urutau-01.mp3", "d": 214}, {"n": 2, "t": "Bloodbath", "f": "audio/urutau-02.mp3", "d": 153}, {"n": 3, "t": "Rouse the Blood", "f": "audio/urutau-03.mp3", "d": 149}, {"n": 4, "t": "Frenzy", "f": "audio/urutau-04.mp3", "d": 147}, {"n": 5, "t": "Coffin", "f": "audio/urutau-05.mp3", "d": 227}, {"n": 6, "t": "Queen of Hearts", "f": "audio/urutau-06.mp3", "d": 223}, {"n": 7, "t": "Mother Moon", "f": "audio/urutau-07.mp3", "d": 314}, {"n": 8, "t": "Elder Favor", "f": "audio/urutau-08.mp3", "d": 345}, {"n": 9, "t": "Ghoul", "f": "audio/urutau-09.mp3", "d": 162}, {"n": 10, "t": "The Rower of Time", "f": "audio/urutau-10.mp3", "d": 389}], "capaPublica": "audio/capa.jpg"}, "contador": "jfbynight-21ed15ca5bbbd007"}</script><script>
+// Player do disco da Urutau: independente do login, segue tocando entre páginas, com volume e gancho de contagem
+window.AlbumPlayer = (function () {
+  let ALB = null, i = -1, a = null, bar = null;
+  const fmt = x => `${Math.floor(x / 60)}:${String(Math.floor(x % 60)).padStart(2, '0')}`;
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const store = { get(k, d) { try { const v = localStorage.getItem('alb-' + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } }, set(k, v) { try { localStorage.setItem('alb-' + k, JSON.stringify(v)); } catch (e) {} } };
+  const api = { onStart: null, fmt };
+  function build() {
+    if (bar) return bar;
+    bar = document.createElement('div'); bar.id = 'player'; bar.hidden = true;
+    bar.innerHTML = `<img alt="" class="pc"><div class="pi"><div class="pt"></div><div class="pa">${esc(ALB.banda)} · ${esc(ALB.titulo)}</div></div>
+      <div class="pb"><button type="button" data-pl="prev" aria-label="Faixa anterior">⏮</button><button type="button" data-pl="toggle" aria-label="Tocar ou pausar">⏸</button><button type="button" data-pl="next" aria-label="Próxima faixa">⏭</button></div>
+      <input type="range" class="pos" min="0" max="1000" value="0" aria-label="Posição na faixa"><span class="tm">0:00</span>
+      <span class="vol"><button type="button" data-pl="mute" aria-label="Silenciar">🔊</button><input type="range" class="vr" min="0" max="100" aria-label="Volume"></span>
+      <button type="button" data-pl="close" aria-label="Fechar o player">✕</button>`;
+    document.body.appendChild(bar);
+    a = new Audio(); a.preload = 'auto';
+    const pos = bar.querySelector('.pos'), tm = bar.querySelector('.tm'), tg = bar.querySelector('[data-pl=toggle]'), vr = bar.querySelector('.vr'), mu = bar.querySelector('[data-pl=mute]');
+    const setVol = v => { a.volume = v / 100; vr.value = v; mu.textContent = v == 0 ? '🔇' : v < 50 ? '🔉' : '🔊'; store.set('vol', v); };
+    setVol(store.get('vol', 80));
+    a.addEventListener('timeupdate', () => { if (a.duration) { pos.value = Math.round(a.currentTime / a.duration * 1000); tm.textContent = `${fmt(a.currentTime)} / ${fmt(a.duration)}`; } });
+    a.addEventListener('play', () => { tg.textContent = '⏸'; mark(); });
+    a.addEventListener('pause', () => { tg.textContent = '▶'; mark(); });
+    a.addEventListener('ended', () => i < ALB.faixas.length - 1 ? play(i + 1) : (tg.textContent = '▶'));
+    pos.addEventListener('input', () => { if (a.duration) a.currentTime = pos.value / 1000 * a.duration; });
+    vr.addEventListener('input', () => setVol(+vr.value));
+    bar.addEventListener('click', e => {
+      const k = e.target.closest('[data-pl]'); if (!k) return;
+      const c = k.dataset.pl;
+      if (c === 'toggle') a.paused ? a.play() : a.pause();
+      if (c === 'prev') play(Math.max(0, a.currentTime > 3 ? i : i - 1));
+      if (c === 'next' && i < ALB.faixas.length - 1) play(i + 1);
+      if (c === 'mute') { if (a.volume > 0) { store.set('vol0', Math.round(a.volume * 100)); setVol(0); } else setVol(store.get('vol0', 80)); }
+      if (c === 'close') { a.pause(); bar.hidden = true; document.body.classList.remove('playing'); }
+    });
+    return bar;
+  }
+  async function play(n) {
+    if (!ALB) return;
+    build(); const f = ALB.faixas[n]; i = n;
+    bar.hidden = false; document.body.classList.add('playing');
+    bar.querySelector('.pt').textContent = `${String(f.n).padStart(2, '0')} · ${f.t}`;
+    bar.querySelector('.pc').src = ALB.capaPublica || ALB.capa;
+    a.src = f.f;
+    try { await a.play(); } catch (e) {}
+    mark();
+    if (api.onStart) try { api.onStart(n, f); } catch (e) {}
+  }
+  function mark() {
+    document.querySelectorAll('.tracks [data-play]').forEach(b => b.classList.toggle('on', !!a && !a.paused && +b.dataset.play === i));
+  }
+  document.addEventListener('click', e => { const b = e.target.closest('[data-play]'); if (b && ALB) { e.preventDefault(); play(+b.dataset.play); } });
+  addEventListener('hashchange', () => setTimeout(mark, 0));
+  api.init = alb => { ALB = alb; };
+  api.play = play; api.mark = mark;
+  api.state = () => ({ i, playing: !!a && !a.paused, t: a ? a.currentTime : 0 });
+  return api;
+})();
+</script>
+
 <script id="app" type="text/plain">
 const D = window.__D;
 const V = D.viewer || { mode: 'gm' };
@@ -938,6 +1007,7 @@ function egoMap(c, R) {
 // ---------------- disco da Urutau: aba na nota da banda, anúncio no início e player que segue tocando entre as páginas
 const ALB = D.album || null;
 const fmtT = x => `${Math.floor(x / 60)}:${String(Math.floor(x % 60)).padStart(2, '0')}`;
+const plays = i => GM && window.__playCounts ? ` <span class="plays" data-plays="${i}" title="reproduções">…</span>` : '';
 function albumPromo() {
   if (!ALB) return '';
   const note = D.notes.find(n => n.id === 'urutau-banda');
@@ -958,12 +1028,18 @@ function albumHtml() {
     <div class="stack" style="gap:12px">
       <div><div class="eyebrow">${esc(ALB.banda)} · ${ALB.ano} · ${ALB.faixas.length} faixas · ${fmtT(tot)}</div><h2>${esc(ALB.titulo)}</h2></div>
       <div class="row"><button type="button" class="btn" data-play="0">▶ Tocar o disco</button></div>
-      <ol class="tracks">${ALB.faixas.map((f, i) => `<li><button type="button" data-play="${i}"><span class="n">${String(f.n).padStart(2, '0')}</span><span class="t">${esc(f.t)}</span><span class="d">${fmtT(f.d)}</span></button></li>`).join('')}</ol>
+      <ol class="tracks">${ALB.faixas.map((f, i) => `<li><button type="button" data-play="${i}"><span class="n">${String(f.n).padStart(2, '0')}</span><span class="t">${esc(f.t)}</span><span class="d">${fmtT(f.d)}${plays(i)}</span></button></li>`).join('')}</ol>
+      ${GM && window.__playCounts ? '<p class="count">Reproduções contadas no site publicado (cada vez que alguém dá play numa faixa). Só o narrador vê.</p>' : ''}
       <dl class="kv">${ALB.creditos.map(([a, b]) => `<dt>${esc(b)}</dt><dd>${byName[a] ? `<a href="#p-${byName[a].id}">${esc(a)}</a>` : esc(a)}</dd>`).join('')}</dl>
       <p class="count">${esc(ALB.nota)}</p>
     </div></div>`;
 }
+function fillPlays() {
+  if (!(GM && window.__playCounts)) return;
+  window.__playCounts().then(arr => { document.querySelectorAll('[data-plays]').forEach(el => { const v = arr[+el.dataset.plays]; el.textContent = v == null ? '—' : `▶ ${v}`; }); });
+}
 function vBanda(nt) {
+  AFTER.push(fillPlays); AFTER.push(() => window.AlbumPlayer && AlbumPlayer.mark());
   const tabs = [['disco', `Disco · ${ALB.titulo}`], ['banda', 'A banda']];
   return `<div class="stack">${nt.img ? `<img class="banner" src="${nt.img}" alt="">` : ''}
     <div><div class="eyebrow">Nota · Banda</div><h1>Urutau</h1><p class="lede">${esc(ALB.titulo)}, o novo disco, já está tocando na cidade.</p></div>
@@ -972,48 +1048,9 @@ function vBanda(nt) {
     <section data-panel="banda" hidden><div class="prose">${nt.html || ''}</div></section></div>`;
 }
 const byName = {}; D.chars.forEach(c => byName[c.name] = c);
-const PL = { i: -1, a: null };
-function playerBar() {
-  let bar = document.getElementById('player');
-  if (bar) return bar;
-  bar = document.createElement('div'); bar.id = 'player'; bar.hidden = true;
-  bar.innerHTML = `<img alt="" class="pc"><div class="pi"><div class="pt"></div><div class="pa">${ALB ? esc(ALB.banda) + ' · ' + esc(ALB.titulo) : ''}</div></div>
-    <div class="pb"><button type="button" data-pl="prev" aria-label="Faixa anterior">⏮</button><button type="button" data-pl="toggle" aria-label="Tocar ou pausar">⏸</button><button type="button" data-pl="next" aria-label="Próxima faixa">⏭</button></div>
-    <input type="range" min="0" max="1000" value="0" aria-label="Posição na faixa"><span class="tm">0:00</span>
-    <button type="button" data-pl="close" aria-label="Fechar o player">✕</button>`;
-  document.body.appendChild(bar);
-  const a = PL.a = new Audio(); a.preload = 'auto';
-  const rng = bar.querySelector('input'), tm = bar.querySelector('.tm'), tg = bar.querySelector('[data-pl=toggle]');
-  a.addEventListener('timeupdate', () => { if (a.duration) { rng.value = Math.round(a.currentTime / a.duration * 1000); tm.textContent = `${fmtT(a.currentTime)} / ${fmtT(a.duration)}`; } });
-  a.addEventListener('play', () => { tg.textContent = '⏸'; markPlaying(); });
-  a.addEventListener('pause', () => { tg.textContent = '▶'; markPlaying(); });
-  a.addEventListener('ended', () => PL.i < ALB.faixas.length - 1 ? playTrack(PL.i + 1) : (tg.textContent = '▶'));
-  rng.addEventListener('input', () => { if (a.duration) a.currentTime = rng.value / 1000 * a.duration; });
-  bar.addEventListener('click', e => {
-    const k = e.target.closest('[data-pl]'); if (!k) return;
-    const c = k.dataset.pl;
-    if (c === 'toggle') a.paused ? a.play() : a.pause();
-    if (c === 'prev') playTrack(Math.max(0, a.currentTime > 3 ? PL.i : PL.i - 1));
-    if (c === 'next' && PL.i < ALB.faixas.length - 1) playTrack(PL.i + 1);
-    if (c === 'close') { a.pause(); bar.hidden = true; document.body.classList.remove('playing'); }
-  });
-  return bar;
-}
-async function playTrack(i) {
-  if (!ALB) return;
-  const bar = playerBar(); const f = ALB.faixas[i]; PL.i = i;
-  bar.hidden = false; document.body.classList.add('playing');
-  bar.querySelector('.pt').textContent = `${String(f.n).padStart(2, '0')} · ${f.t}`;
-  const cv = bar.querySelector('.pc'); cv.src = ALB.capa; if (window.__mediaSrc) window.__mediaSrc(cv);
-  PL.a.src = window.__audioSrc ? await window.__audioSrc(f.f) : f.f;
-  try { await PL.a.play(); } catch (e) {}
-  markPlaying();
-}
-function markPlaying() {
-  document.querySelectorAll('[data-play]').forEach(b => b.classList.toggle('on', PL.a && !PL.a.paused && +b.dataset.play === PL.i && b.closest('.tracks')));
-}
-document.addEventListener('click', e => { const b = e.target.closest('[data-play]'); if (b) { e.preventDefault(); playTrack(+b.dataset.play); } });
-addEventListener('hashchange', () => setTimeout(markPlaying, 0));
+if (ALB && window.AlbumPlayer) AlbumPlayer.init(ALB);
+const playTrack = i => window.AlbumPlayer && AlbumPlayer.play(i);
+
 /* ---------- roteamento ---------- */
 function route() {
   AFTER.length = 0;
@@ -1066,6 +1103,21 @@ route();
   const CFG = JSON.parse(document.getElementById('atlas-cfg').textContent);
   const PH = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7#';
   const box = document.getElementById('login'), form = document.getElementById('lf'), msg = document.getElementById('lmsg');
+  const ALB = CFG.album;
+  const CNT = 'https://abacus.jasoncameron.dev';
+  const ckey = n => `faixa-${String(n).padStart(2, '0')}`;
+  if (ALB && window.AlbumPlayer) {
+    AlbumPlayer.init(ALB);
+    AlbumPlayer.onStart = (i, f) => { try { fetch(`${CNT}/hit/${CFG.contador}/${ckey(f.n)}`, { mode: 'cors' }).catch(() => {}); } catch (e) {} };
+    const L = document.getElementById('lalb');
+    if (L) L.innerHTML = `<img src="${ALB.capaPublica}" alt="Capa de ${ALB.titulo}"><div><div class="eyebrow" style="color:var(--blood)">Lançamento · ${ALB.ano}</div>
+      <h2 style="font-size:24px;margin:2px 0 8px">${ALB.banda} · <em>${ALB.titulo}</em></h2><p class="count" style="margin:0 0 8px">Pode ouvir sem entrar. O player continua tocando depois do login.</p>
+      <ol class="tracks">${ALB.faixas.map((f, i) => `<li><button type="button" data-play="${i}"><span class="n">${String(f.n).padStart(2, '0')}</span><span class="t">${f.t}</span><span class="d">${AlbumPlayer.fmt(f.d)}</span></button></li>`).join('')}</ol></div>`;
+  }
+  async function playCounts() {
+    if (!ALB) return [];
+    return Promise.all(ALB.faixas.map(f => fetch(`${CNT}/get/${CFG.contador}/${ckey(f.n)}`).then(r => r.ok ? r.json() : { value: 0 }).then(j => j.value ?? 0).catch(() => null)));
+  }
 
   async function fileFor(user) {
     return hex(await crypto.subtle.digest('SHA-256', enc.encode(CFG.salt + ':' + user.toLowerCase().trim()))).slice(0, 24);
@@ -1090,7 +1142,9 @@ route();
     const key = await crypto.subtle.deriveKey({ name: 'PBKDF2', salt: b64(p.salt), iterations: p.iter, hash: 'SHA-256' },
       base, { name: 'AES-GCM', length: 256 }, true, ['decrypt']);
     const plain = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: b64(p.iv) }, key, b64(p.ct));
-    try { sessionStorage.setItem('atlas', JSON.stringify({ f: file, k: tob64(await crypto.subtle.exportKey('raw', key)) })); } catch (e) {}
+    const keep = form.k ? form.k.checked : false;
+    const rec = JSON.stringify({ f: file, k: tob64(await crypto.subtle.exportKey('raw', key)), exp: Date.now() + 30 * 864e5 });
+    try { (keep ? localStorage : sessionStorage).setItem('atlas', rec); } catch (e) {}
     return JSON.parse(await gunzip(plain));
   }
 
@@ -1175,7 +1229,7 @@ route();
   async function start(data) {
     IMG = data.img || {};
     window.__D = data.D;
-    if (data.D.viewer.mode === 'gm') window.__ATLAS = atlasGM(data.extra || {});
+    if (data.D.viewer.mode === 'gm') { window.__ATLAS = atlasGM(data.extra || {}); window.__playCounts = playCounts; }
     else window.__ATLAS = null;
     box.remove();
     document.getElementById('shell').hidden = false;
@@ -1185,7 +1239,7 @@ route();
     // sair
     const g = document.querySelector('.side .gm');
     if (g) { const b = document.createElement('button'); b.type = 'button'; b.className = 'btn'; b.style.marginTop = '10px'; b.textContent = 'Sair';
-      b.onclick = () => { try { sessionStorage.removeItem('atlas'); } catch (e) {} location.hash = ''; location.reload(); }; g.appendChild(b); }
+      b.onclick = () => { try { sessionStorage.removeItem('atlas'); localStorage.removeItem('atlas'); } catch (e) {} location.hash = ''; location.reload(); }; g.appendChild(b); }
   }
 
   form.addEventListener('submit', async e => {
@@ -1195,12 +1249,13 @@ route();
   });
   (async () => {
     try {
-      const s = JSON.parse(sessionStorage.getItem('atlas') || 'null');
+      let s = JSON.parse(sessionStorage.getItem('atlas') || 'null');
+      if (!s) { s = JSON.parse(localStorage.getItem('atlas') || 'null'); if (s && !(s.exp > Date.now())) { localStorage.removeItem('atlas'); s = null; } }
       if (s) {
         const key = await crypto.subtle.importKey('raw', b64(s.k), 'AES-GCM', false, ['decrypt']);
         await start(await openWithKey(s.f, key)); return;
       }
-    } catch (e) { try { sessionStorage.removeItem('atlas'); } catch (_) {} }
+    } catch (e) { try { sessionStorage.removeItem('atlas'); localStorage.removeItem('atlas'); } catch (_) {} }
     box.hidden = false; form.u.focus();
   })();
 })();
